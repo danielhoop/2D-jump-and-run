@@ -50,6 +50,9 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
     const mp = [];
     const trailWidthShould = trailWidth;
 
+    let wentLeft = [false, false];
+    let wentRight = [false, false];
+
     let trailContinuationLast = [];
     for (let i = 0; i < mapWidth; i++) {
         trailContinuationLast[i] = false;
@@ -59,8 +62,6 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
         let trailWidthIs = 0;
 
         let changeDir = false;
-        let wentLeft = [false, false];
-        let wentRight = [false, false];
 
         const trailContinuationThis = [];
         for (let i = 0; i < mapWidth; i++) {
@@ -80,7 +81,7 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
                     trailContinuationThis[x] = true;
                     trailWidthIs++;
                 } else {
-                    // Cannot be collapsed with case (x == midPoint) !!!
+                    // This case cannot be collapsed with case (x == midPoint) !!!
                     if (trailWidthIs < trailWidthShould) {
                         line[x] = create(TRAIL, x, y);
                         trailContinuationThis[x] = true;
@@ -138,28 +139,41 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
             for (var x = 0; x < mapWidth; x++) {
                 line[x] = createRandomElement(GRASS, x, y);
                 if (goLeft) {
-                    if (x + trailWidth <= (mapWidth - 1 - MARGIN) && lastLine[x + trailWidth].isTrail) {
+                    if (x + trailWidth <= (mapWidth - 1) && trailContinuationLast[x + trailWidth]) {
                         line[x] = createRandomElement(TRAIL, x, y, true);
                         trailContinuationThis[x] = true;
-                    } else if (lastLine[x].isTrail) {
+                        //console.log("x = " + x + ", has happened! 1.1");
+                    } else if (trailContinuationLast[x]) {
                         line[x] = createRandomElement(TRAIL, x, y, true);
+                        if (x - trailWidth < MARGIN) {
+                            wentLeft[wentLeft.length] = false;
+                            trailContinuationThis[x] = true;
+                            //console.log("x = " + x + ", has happened! 1");
+                        }
                     }
                 } else if (goRight) {
-                    if (x - trailWidth >= MARGIN && lastLine[x - trailWidth].isTrail) {
+                    if (trailContinuationLast[x]) {
+                        line[x] = createRandomElement(TRAIL, x, y, true);
+                        if (x + trailWidth > mapWidth - 1 + MARGIN) {
+                            wentRight[wentRight.length] = false;
+                            trailContinuationThis[x] = true;
+                            //console.log("x = " + x + ", has happened! 2");
+                        }
+                    } else if (x - trailWidth >= MARGIN && trailContinuationLast[x - trailWidth]) {
                         line[x] = createRandomElement(TRAIL, x, y, true);
                         trailContinuationThis[x] = true;
-                    } else if (lastLine[x].isTrail) {
-                        line[x] = createRandomElement(TRAIL, x, y, true);
+                        //console.log("x = " + x + ", has happened! 2.1");
                     }
                 } else {
                     if (trailContinuationLast[x]) {
+                        //console.log("x = " + x + ", has happened! 3");
                         line[x] = createRandomElement(TRAIL, x, y, true);
                         trailContinuationThis[x] = true;
                     }
                 }
             }
         }
-
+        //console.log(trailContinuationThis); console.log(line);
         trailContinuationLast = trailContinuationThis;
         mp[y] = line;
     }
