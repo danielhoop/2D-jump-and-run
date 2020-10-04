@@ -7,7 +7,16 @@
 // animal: probability of animal.
 // food: probability of food.
 
-mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, animal, food) {
+interface Field {
+    isTrail: boolean,
+    background: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+}
+
+const mapCreator = function (mapLength: number, mapWidth: number, trailWidth: number, multiplier: number, dir: number, stone: number, animal: number, food: number): Array<Array<Field>> {
     const MARGIN = 0;
     const TRAIL = "../img/trail.png";
     const GRASS = "../img/grass.png";
@@ -17,7 +26,7 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
     const APPLE = "../img/apple.png";
     const BANANA = "../img/banana.png";
 
-    create = function (backgroundPath, x, y, isTrail = false) {
+    const create = function (backgroundPath: string, x: number, y: number, isTrail = false): Field {
         return {
             isTrail: isTrail || backgroundPath === TRAIL,
             background: backgroundPath,
@@ -28,7 +37,7 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
         };
     }
 
-    createRandomElement = function (alternative, x, y, isTrail = false) {
+    const createRandomElement = function (alternative: string, x: number, y: number, isTrail = false): Field {
         if (Math.random() <= stone) {
             return create(STONE, x, y, isTrail);
 
@@ -47,18 +56,18 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
         return create(alternative, x, y, isTrail);
     }
 
-    const mp = [];
+    const mp: Array<Array<Field>> = [];
     const trailWidthShould = trailWidth;
 
-    let wentLeft = [false, false];
-    let wentRight = [false, false];
+    const wentLeft = [false, false];
+    const wentRight = [false, false];
 
     let trailContinuationLast = [];
     for (let i = 0; i < mapWidth; i++) {
         trailContinuationLast[i] = false;
     }
 
-    for (var y = 0; y < mapLength; y++) {
+    for (let y = 0; y < mapLength; y++) {
         let trailWidthIs = 0;
 
         let changeDir = false;
@@ -68,12 +77,12 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
             trailContinuationThis[i] = false;
         }
 
-        let line = [];
+        const line: Array<Field> = [];
 
         // First line is special. Trail is located in the middle.
         if (y == 0) {
-            var midPoint = Math.round(mapWidth / 2);
-            for (var x = 0; x < mapWidth; x++) {
+            const midPoint = Math.round(mapWidth / 2);
+            for (let x = 0; x < mapWidth; x++) {
                 if (x < midPoint) {
                     line[x] = createRandomElement(GRASS, x, y);
                 } else if (x == midPoint) {
@@ -95,7 +104,7 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
             // Copy last trail.
         } else if (y % trailWidth != 0) {
             const lastLine = mp[y - 1];
-            for (var x = 0; x < mapWidth; x++) {
+            for (let x = 0; x < mapWidth; x++) {
                 if (lastLine[x].isTrail) {
                     line[x] = createRandomElement(TRAIL, x, y, true);
                 } else {
@@ -106,7 +115,6 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
 
             // Decide about new trail direction.
         } else {
-            const lastLine = mp[y - 1];
             let goLeft = false;
             let goRight = false;
             changeDir = Math.random() <= dir;
@@ -136,7 +144,7 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
             }
 
             // Loop over all x
-            for (var x = 0; x < mapWidth; x++) {
+            for (let x = 0; x < mapWidth; x++) {
                 line[x] = createRandomElement(GRASS, x, y);
                 if (goLeft) {
                     if (x + trailWidth <= (mapWidth - 1) && trailContinuationLast[x + trailWidth]) {
@@ -179,4 +187,7 @@ mapCreator = function (mapLength, mapWidth, trailWidth, multiplier, dir, stone, 
     }
 
     console.log(mp);
+    return mp;
 }
+
+export default mapCreator;

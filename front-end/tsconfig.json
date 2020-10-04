@@ -1,17 +1,13 @@
 {
-    "compilerOptions": {
-      "lib": ["dom", "ES2016"],
-      "target": "ES5",
-      "jsx": "react",
-      "rootDir": "./src",
-      "outDir": "./build",
-
-      "sourceMap": true,
-      "noImplicitAny": true,
-      "module": "commonjs",
-      
-      "allowJs": true,
-      "allowSyntheticDefaultImports": true,
-      "esModuleInterop": true
-    }
+  "compilerOptions": {
+    "target": "es2017",      /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', or 'ESNEXT'. */
+    "module": "commonjs",    /* Specify module code generation: 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
+    "rootDir": "./src",      /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+    "outDir": "./build-tsc", /* Redirect output structure to the directory. */
+    
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true
   }
+}

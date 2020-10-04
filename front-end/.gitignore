@@ -2,3 +2,5 @@ node_modules
 
 src/config/secret.js
 build
+build-tsc
+build-babel

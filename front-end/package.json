@@ -4,11 +4,18 @@
   "description": "5-Seen-Wanderung-Spiel Back-End. Websocket fuer Spiel-Synchronisation zwischen Front-Ends.",
   "main": "index.html",
   "scripts": {
-    "prebuild": "rimraf ./build",
-    "build": "tsc",
-    "postbuild": "cpy **/* !**/*.ts ../build --cwd=./src --parents",
-    "pipeline": "npm run prebuild && npm run build && npm run postbuild",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rimraf build",
+    "babel": "./node_modules/.bin/babel build-tsc --out-dir build-babel --source-maps",
+    "webpack": "webpack --config webpack.config.jscript && npm run postbuild",
+    "clean-build-steps": "rimraf build-tsc build-babel",
+    "pipeline": "npm run clean && tsc && npm run babel && npm run webpack && npm run clean-build-steps",
+
+    "ts": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+  
+    "ALT_prebuild": "rimraf ./build",
+    "ALT_postbuild": "cpy **/* !**/*.ts ../build --cwd=./src --parents",
+    "ALT_pipeline": "npm run prebuild && tsc && npm run postbuild",
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
@@ -30,7 +37,8 @@
     "eslint-plugin-standard": "^4.0.1",
     "nodemon": "^2.0.4",
     "rimraf": "^3.0.2",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.2"
   },
   "author": "Daniel Hoop & Mehrdad Zendehzaban",
   "license": "UNLICENSED"
