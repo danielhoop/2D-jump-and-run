@@ -4,18 +4,16 @@
   "description": "5-Seen-Wanderung-Spiel Back-End. Websocket fuer Spiel-Synchronisation zwischen Front-Ends.",
   "main": "index.html",
   "scripts": {
-    "clean": "rimraf build",
-    "babel": "./node_modules/.bin/babel build-tsc --out-dir build-babel --source-maps",
-    "webpack": "webpack --config webpack.config.jscript && npm run postbuild",
-    "clean-build-steps": "rimraf build-tsc build-babel",
-    "pipeline": "npm run clean && tsc && npm run babel && npm run webpack && npm run clean-build-steps",
-
+    "clean-build": "rimraf build",
     "ts": "tsc",
+    "babel": "./node_modules/.bin/babel build-tsc --out-dir build-babel --source-maps",
+    "webpack": "webpack --config webpack.config.jscript",
+    "clean-build-steps": "rimraf build-tsc build-babel",
+    "postbuild": "cpy **/* !**/*.ts ../build --cwd=./src --parents",
+    "pipeline": "npm run clean-build && npm run ts && npm run babel && npm run webpack && npm run clean-build-steps && npm run postbuild",
     "test": "echo \"Error: no test specified\" && exit 1",
-  
     "ALT_prebuild": "rimraf ./build",
-    "ALT_postbuild": "cpy **/* !**/*.ts ../build --cwd=./src --parents",
-    "ALT_pipeline": "npm run prebuild && tsc && npm run postbuild",
+    "ALT_pipeline": "npm run prebuild && tsc && npm run postbuild"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
@@ -35,10 +33,10 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.20.6",
     "eslint-plugin-standard": "^4.0.1",
-    "nodemon": "^2.0.4",
     "rimraf": "^3.0.2",
     "typescript": "^3.9.7",
-    "webpack": "^4.44.2"
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
   },
   "author": "Daniel Hoop & Mehrdad Zendehzaban",
   "license": "UNLICENSED"
