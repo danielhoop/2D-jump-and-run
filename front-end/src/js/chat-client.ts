@@ -1,3 +1,4 @@
+import $ from "./jquery-2.1.3.min";
 import { User } from "./user";
 import {
     SocketData,
@@ -10,7 +11,7 @@ interface ChatMessage {
 }
 
 class Chat {
-    msgs: Array<ChatMessage> = [];
+    // msgs: Array<ChatMessage> = [];
     socket: WebSocket;
     user: User;
 
@@ -22,16 +23,30 @@ class Chat {
     sendMsg(txt: string): void {
         const chatMsg: ChatMessage = {
             user: this.user,
-            txt: txt };
+            txt: txt
+        };
         const socketMsg: SocketData = {
             type: SocketDataEnum.chatMessage,
-            payload: chatMsg };
+            broadcast: true,
+            payload: chatMsg
+        };
         this.socket.send(JSON.stringify(socketMsg));
     }
 
     receiveMsg(msg: ChatMessage): void {
-        this.msgs.push(msg);
-        console.log(this.msgs);
+        const msgClass = msg.user.id == this.user.id ? "msg-own" : "msg-other";
+        $("#chat-messages").append(
+            '<div class = "' + msgClass + '"> \
+            <div class = "msg-sender">' + msg.user.name + '</div> \
+            <div class = "msg-txt">' + msg.txt + '</div> \
+            </div>'
+        );
+
+        // Always scroll down
+        const element = $("#chat-messages").get(0);
+        element.scrollTop = element.scrollHeight;
+
+        // this.msgs.push(msg);
     }
 
 }

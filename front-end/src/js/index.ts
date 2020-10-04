@@ -54,8 +54,14 @@ $(document).ready(function () {
 
         socket.onmessage = function (e) {
             const data: SocketData = JSON.parse(e.data);
-            if (data.type == SocketDataEnum.chatMessage) {
-                chat.receiveMsg(data.payload);
+            switch(data.type) {
+                case SocketDataEnum.userId:
+                    user.id = data.payload;
+                    console.log("After receiving user id, the userId is: " + user.id);
+                    break;
+                case SocketDataEnum.chatMessage:
+                    chat.receiveMsg(data.payload);
+                    break;
             }
         }
     }

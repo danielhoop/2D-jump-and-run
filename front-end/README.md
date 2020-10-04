@@ -1,11 +1,28 @@
-# Run the build pipeline
-[https://technicallyrural.ca/2017/09/02/how-to-run-typescript-in-the-browser/](source)
+# Do only once: install npm
+Download and install npm from [https://www.npmjs.com/get-npm](here).  
 
-Open command line in this folder, then execute this command (it will take approx. 10 seconds):
+After installation, open the shell in this folder, then execute this command:
+```
+npm install
+```
+
+
+# Run the build pipeline
+
+## If you have changed javascript code
+Open the shell in this folder, then execute this command (it will take approx. 15 seconds):
 ```
 npm run pipeline
 ```
+[https://technicallyrural.ca/2017/09/02/how-to-run-typescript-in-the-browser/](source)
 
+## If you have changed html and css
+Open the shell in this folder, then execute this command:
+```
+npm run postbuild
+```
+
+## Launch website
 Open this file in your web browser:
 ./build/index.html
 
@@ -15,7 +32,7 @@ Open this file in your web browser:
 
 
 
-# --- ALT ---
+# ----- ALT -----
 # Do once: install dependencies
 Open command line in this folder, then execute this command:
 ```

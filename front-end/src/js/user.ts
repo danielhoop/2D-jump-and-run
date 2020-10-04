@@ -19,6 +19,6 @@ export interface User {
 export const createUser = function(name: string): User {
   return {
     name: name,
-    id: "1" + Math.floor(Math.random() * 1000000000)
+    id: "1" + Math.floor(Math.random() * 1000000000000)
   }
 }
