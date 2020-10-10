@@ -26,8 +26,8 @@ class Chat {
             txt: txt
         };
         const socketMsg: SocketData = {
-            type: SocketDataEnum.chatMessage,
-            broadcast: true,
+            type: SocketDataEnum.CHAT_MESSAGE,
+            roomId: this.user.roomId,
             payload: chatMsg
         };
         this.socket.send(JSON.stringify(socketMsg));

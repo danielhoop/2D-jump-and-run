@@ -5,11 +5,12 @@ import game from "./game";
 import Chat from "./chat-client"
 import {
     createUser,
-    User
+    User,
 } from "./user";
 import {
     SocketData,
     SocketDataEnum,
+    UserData
 } from "./types";
 
 
@@ -80,14 +81,18 @@ $(document).ready(function () {
 
         socket.onmessage = function (e) {
             const data: SocketData = JSON.parse(e.data);
-            switch (data.type) {
-                case SocketDataEnum.userId:
-                    user.id = data.payload;
-                    console.log("After receiving user id, the userId is: " + user.id);
-                    break;
-                case SocketDataEnum.chatMessage:
-                    chat.receiveMsg(data.payload);
-                    break;
+            
+            if (data.type == SocketDataEnum.USER_DATA) {
+                const payload: UserData = data.payload;
+                if (payload.userId) {
+                    user.id = payload.userId;
+                }
+                if (payload.roomId) {
+                    user.roomId = payload.roomId;
+                }
+
+            } else if (data.type == SocketDataEnum.CHAT_MESSAGE) {
+                chat.receiveMsg(data.payload);
             }
         }
     }

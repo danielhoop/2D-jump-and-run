@@ -1,11 +1,21 @@
+export const constants = {
+    LOBBY: "LOBBY"
+}
+
 export enum SocketDataEnum {
-    chatMessage = "chatMessage",
-    userId = "userId"
+    CHAT_MESSAGE = "CHAT_MESSAGE",
+    USER_DATA = "USER_DATA"
+}
+
+export interface UserData {
+    userId?: string,
+    roomId?: string
 }
 
 export interface SocketData {
     type: SocketDataEnum,
-    broadcast: boolean,
-    recipients?: Array<string>,
+    broadcast?: boolean,
+    recipientIds?: Array<string>,
+    roomId?: string;
     payload: any
 }
