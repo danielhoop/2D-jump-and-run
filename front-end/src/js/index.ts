@@ -1,5 +1,6 @@
-import $ from "./jquery-2.1.3.min";
+import $ from "jquery";
 
+import dom from "./dom-operator";
 import game from "./game";
 import Chat from "./chat-client"
 import {
@@ -14,6 +15,9 @@ import {
 
 
 $(document).ready(function () {
+
+    // Open model to give username.
+    dom.hideAllExcept(["#name-modal"]);
 
     // Create a user
     const user: User = createUser("Daniel");
@@ -36,7 +40,7 @@ $(document).ready(function () {
         const chat = new Chat(socket, user);
         
         const readMsgClearAndSend = function(): void {
-            const val = $("#chat-editor").val();
+            const val = $("#chat-editor").val().toString();
             $("#chat-editor").val("");
             chat.sendMsg(val);
             console.log('Chat message was sent.');
@@ -44,7 +48,7 @@ $(document).ready(function () {
         
         $("#chat-editor").keypress(function (event) {
             const keycode = (event.keyCode ? event.keyCode : event.which);
-            if (keycode == '13') {
+            if (keycode == 13) {
                 readMsgClearAndSend();
             }
         });

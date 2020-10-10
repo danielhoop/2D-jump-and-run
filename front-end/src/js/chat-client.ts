@@ -1,4 +1,4 @@
-import $ from "./jquery-2.1.3.min";
+import $ from "jquery";
 import { User } from "./user";
 import {
     SocketData,

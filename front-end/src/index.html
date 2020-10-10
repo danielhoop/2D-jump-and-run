@@ -1,48 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>5-Seen-Wanderung</title>
-        <link rel="stylesheet" href="css/game-elements.css" />
-        <link rel="stylesheet" href="css/index.css" />
-    </head>
 
-    <body>
-        <header>
-            <h1>5-Seen-Wanderung</h1>
-        </header>
-        
-        <div id="game"></div>
-        <div id = "chat">
-            <div id = "chat-close-button"></div>
-            <div id = "chat-messages">
-                <div class = "msg-other">
-                    <div class = "msg-sender">Andere Person</div>
-                    <div class = "msg-txt">Hallo, Daniel. Wollen wir loslegen?</div>
-                </div>
-                <div class = "msg-own">
-                    <div class = "msg-sender">Daniel</div>
-                    <div class = "msg-txt">Ja, los geht's!</div>
-                </div>
+<head>
+    <meta charset="utf-8" />
+    <title>5-Seen-Wanderung</title>
+    <link rel="stylesheet" href="css/game-elements.css" />
+    <link rel="stylesheet" href="css/index.css" />
+</head>
+
+<body>
+    <!-- <header>
+        <h1>5-Seen-Wanderung</h1>
+    </header> -->
+
+    <div class="bg-image"></div>
+
+    <div id="name-modal" class="modal">
+        <div class="title">Please enter your nickname</div>
+        <input id="name-editor" type="text" value=""></input>
+        <button id="name-enter-button" type="button">Proceed</button>
+    </div>
+
+    <div id="game"></div>
+
+    <div id="chat">
+        <div id="chat-close-button"></div>
+        <div id="chat-messages">
+            <div class="msg-other">
+                <div class="msg-sender">Andere Person</div>
+                <div class="msg-txt">Hallo, Daniel. Wollen wir loslegen?</div>
             </div>
-            <div id = "chat-input-line">
-                <div class = "text-field-left">
-                    <!-- <div id = "chat-editor" contenteditable="true">Nachricht hier.</div> */ -->
-                    <input id = "chat-editor" type="text" value = ""></input>
-                </div>
-                <div class = "button-right">
-                    <button id = "chat-send-button" type = "button" class = "button button-small button-assertive"> > </button>
-                </div>
-                 <!-- <img id = "chat-send-button" src = "img/chat-send-button.png" /> -->
+            <div class="msg-own">
+                <div class="msg-sender">Daniel</div>
+                <div class="msg-txt">Ja, los geht's!</div>
             </div>
         </div>
-        <div id = "chat-open-button"></div>
-        
-        <footer>
-            Geniessen Sie die Wanderung!
-        </footer>
+        <div id="chat-input-line">
+            <div class="text-field-left">
+                <input id="chat-editor" type="text" value=""></input>
+            </div>
+            <div class="button-right">
+                <button id="chat-send-button" type="button" class="button button-small button-assertive"> >
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="chat-open-button"></div>
 
-        <script src="./js/bundle.js"></script>
-    </body>
-  
+    <footer>
+        &copy; 2020, Daniel Hoop, Mehrdad Zendehzaban. All rights reserved.
+    </footer>
+
+    <script src="./js/bundle.js"></script>
+</body>
+
 </html>

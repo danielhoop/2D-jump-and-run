@@ -4,7 +4,7 @@ export enum SocketDataEnum {
 }
 
 export interface SocketData {
-    type: string,
+    type: SocketDataEnum,
     broadcast: boolean,
     recipients?: Array<string>,
     payload: any

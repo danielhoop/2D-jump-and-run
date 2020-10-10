@@ -39,5 +39,9 @@
     "webpack-cli": "^3.3.12"
   },
   "author": "Daniel Hoop & Mehrdad Zendehzaban",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@types/jquery": "^3.5.2",
+    "jquery": "^3.5.1"
+  }
 }
