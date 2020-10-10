@@ -1,5 +1,5 @@
 # Do only once: install npm
-Download and install npm from [https://www.npmjs.com/get-npm](here).  
+Download and install npm from [https://www.npmjs.com/get-npm](https://www.npmjs.com/get-npm).  
 
 After installation, open the shell in this folder, then execute this command:
 ```
@@ -14,7 +14,7 @@ Open the shell in this folder, then execute this command (it will take approx. 1
 ```
 npm run pipeline
 ```
-[https://technicallyrural.ca/2017/09/02/how-to-run-typescript-in-the-browser/](source)
+Source: [https://technicallyrural.ca/2017/09/02/how-to-run-typescript-in-the-browser/](https://technicallyrural.ca/2017/09/02/how-to-run-typescript-in-the-browser/)
 
 ## If you have changed html and css
 Open the shell in this folder, then execute this command:
@@ -22,9 +22,9 @@ Open the shell in this folder, then execute this command:
 npm run postbuild
 ```
 
-## Launch website
-Open this file in your web browser:
-./build/index.html
+# Launch website
+Open this file in your web browser:  `./build/index.html`.  
+Don't forget to run the server in `../back-end/`  
 
 
 

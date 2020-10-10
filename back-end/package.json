@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "cleanBuild": "rimraf ./build",
-    "pipeline": "npm run cleanBuild && npm run ts && node ./build/index.js",
+    "pipeline": "npm run cleanBuild && npm run ts && npm run startServer",
+    "startServer": "node ./build/index.js",
     "ts": "tsc",
     "debug": "nodemon --inspect ./build/index",
     "test": "echo \"Error: no test specified\" && exit 1"
