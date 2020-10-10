@@ -12,7 +12,7 @@ const hideAllExcept = function(except: Array<string>): void {
     allElementsOnPage.forEach(element => {
         except.forEach(notHideElement => {
             if (element != notHideElement) {
-                $(element).hide();
+                $(element).css("visibility", "hidden");
             }
         })
     });
