@@ -1,7 +1,8 @@
 import $ from "jquery";
 
 const allElementsOnPage: Array<string> = [
-    "#overlay",
+    "#title",
+    "#group-container",
     "#name-modal",
     "#game",
     "#chat",

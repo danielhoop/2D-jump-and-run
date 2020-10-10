@@ -10,7 +10,6 @@ import {
 
 interface IdentifiableSocket {
     userId: string,
-    roomId: string,
     socket: any
 }
 
@@ -21,15 +20,20 @@ const sockets: Record<string, IdentifiableSocket> = {};
 const rooms: Record<string, Array<string>> = {
     [constants.LOBBY]: []
 };
+const groups: Record<string, Array<string>> = {
+    [constants.GROUP_0]: []
+};
 
 server.on("connection", function (socket) {
 
-    // Send the user his/her id & room.
+    // Send the user his/her id, room & group.
     const userId = "1" + Math.floor(Math.random() * 1000000000000);
     const roomId = constants.LOBBY;
+    const groupId = constants.GROUP_0;
     const userData: UserData = {
         userId: userId,
-        roomId: roomId
+        roomId: roomId,
+        groupId: groupId
     }
     const msg: SocketData = {
         type: SocketDataEnum.USER_DATA,
@@ -40,7 +44,6 @@ server.on("connection", function (socket) {
     // Add the socket together with id to all other sockets.
     sockets[userId] = {
         userId: userId,
-        roomId: roomId,
         socket: socket
     };
 
@@ -58,8 +61,12 @@ server.on("connection", function (socket) {
                 delete rooms[userData.roomId];
             }
         }
+        // Delete from group. The group itself is not deleted (unlike the rooms).
+        if (groups[userData.groupId]) {
+            groups[userData.groupId] = _.difference(groups[userData.groupId], [userData.userId]);
+        }
         console.log("User: '" + userId + "' has left. Room id was: '" + userData.roomId + "'");
-        console.log("Below is the list of sockets and list of rooms.");
+        console.log("Below is the list of sockets, list of rooms, list of groups.");
         console.log(sockets);
         console.log(rooms);
     });

@@ -14,15 +14,11 @@ footer {
     text-align: center;
 }
 
-#main-frame {
-    visibility: hidden;
-}
-
 * {
    box-sizing: border-box;
   }
 
-.title {
+.title-bold {
     font-weight: bold;
     margin-bottom: 5px;
 }
@@ -48,7 +44,7 @@ footer {
 .modal {
     background-color: rgb(222,222,222);
     background-color: rgba(222,222,222, 0.7);
-    border: 3px solid rgba(40, 40, 40, 0.5);
+    /* border: 3px solid rgba(40, 40, 40, 0.5); */
     position: absolute;
     display: inline-block;
     top: 50%;
@@ -58,17 +54,39 @@ footer {
     width: 80%;
     padding: 20px;
     text-align: center;
-
     border-radius: 5px;
   }
 
-/* #overlay {
-    backdrop-filter: blur(6px);
+#group-container {
+    background: rgba(187, 187, 187, 0.5);
     position: absolute;
-    height: 100%;
-    width: 100%;
+    top: 5%;
+    left: 5%;
+    padding: 1%;
+    width: 40%;
+    min-width: 400px;
+    height: 50%;
+    min-height: 400px;
+    border-radius: 5px;
     visibility: hidden;
-} */
+}
+
+.room {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 3px;
+    margin-bottom: 10px;
+}
+
+.group-name {
+    font-family: inherit;
+    font-weight: bold;
+    padding: 1%;
+}
+
+.group-members {
+    font-family: inherit;
+    padding: 1%;
+}
 
 #name-modal {
     visibility: hidden;
@@ -88,8 +106,9 @@ footer {
     bottom: 25px;
     right: 25px;
     width: 30%;
+    min-width: 300px;
     height: 50%;
-    border: 3px solid rgba(30, 30, 30, 0.5);
+    /* border: 3px solid rgba(30, 30, 30, 0.5); */
     border-radius: 10px;
     visibility: hidden;
 }
