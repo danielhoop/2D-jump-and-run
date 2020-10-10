@@ -36,6 +36,7 @@
   "author": "Daniel Hoop & Mehrdad Zendehzaban",
   "license": "UNLICENSED",
   "dependencies": {
+    "lodash": "^4.17.20",
     "ws": "^7.3.1"
   }
 }
