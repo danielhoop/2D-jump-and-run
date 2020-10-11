@@ -71,21 +71,30 @@ footer {
     visibility: hidden;
 }
 
-.room {
+.group {
     background: rgba(255, 255, 255, 0.5);
     border-radius: 3px;
-    margin-bottom: 10px;
+    padding: 1%;
 }
 
 .group-name {
     font-family: inherit;
     font-weight: bold;
-    padding: 1%;
+    padding-bottom: 1%;
 }
 
 .group-members {
     font-family: inherit;
-    padding: 1%;
+}
+
+.group-button {
+    /* button button-small button-assertive */
+    margin-top: 1%;
+    margin-bottom: 10px;
+}
+
+#group-id-0 {
+    margin-bottom: 10px;
 }
 
 #name-modal {

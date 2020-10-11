@@ -9,13 +9,15 @@ export const constants = {
 export enum SocketDataEnum {
     CHAT_MESSAGE = "CHAT_MESSAGE",
     USER_DATA = "USER_DATA",
-    CHANGE_GROUP = "CHANGE_GROUP"
+    USER_CHANGES_GROUP = "USER_CHANGES_GROUP",
+    START_GAME = "START_GAME"
 }
 
 export interface UserData {
-    userId?: string,
-    roomId?: string,
-    groupId?: string
+    name: string,
+    userId: string,
+    roomId: string,
+    groupId: string
 }
 
 export interface SocketData {
