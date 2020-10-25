@@ -6,7 +6,7 @@ export const constants = {
     GROUP_3: "group-id-3"
 }
 
-export enum SocketDataEnum {
+export enum SocketEvent {
     CHAT_MESSAGE = "CHAT_MESSAGE",
     USER_DATA = "USER_DATA",
     USER_CHANGES_GROUP = "USER_CHANGES_GROUP",
@@ -21,7 +21,7 @@ export interface UserData {
 }
 
 export interface SocketData {
-    type: SocketDataEnum,
+    type: SocketEvent,
     broadcast?: boolean,
     recipientIds?: Array<string>,
     roomId?: string;

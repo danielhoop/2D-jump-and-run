@@ -1,8 +1,8 @@
 import $ from "jquery";
-import { User } from "./user";
+import { User } from "./User";
 import {
     SocketData,
-    SocketDataEnum
+    SocketEvent
 } from "./types";
 
 interface ChatMessage {
@@ -26,7 +26,7 @@ class Chat {
             txt: txt
         };
         const socketMsg: SocketData = {
-            type: SocketDataEnum.CHAT_MESSAGE,
+            type: SocketEvent.CHAT_MESSAGE,
             roomId: this.user.roomId,
             payload: chatMsg
         };

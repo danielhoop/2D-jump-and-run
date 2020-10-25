@@ -1,18 +1,19 @@
 import $ from "jquery";
 
 import dom from "./dom-operator";
-import game from "./game";
-import Chat from "./chat-client"
+import Game from "./Game";
+import Chat from "./Chat"
 import {
     createUser,
     User,
-} from "./user";
+} from "./User";
 import {
     SocketData,
-    SocketDataEnum,
+    SocketEvent,
     UserData,
     constants
 } from "./types";
+import { Map } from "./Map";
 
 const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
     const name = $("#name-editor").val().toString();
@@ -33,7 +34,7 @@ const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
             groupId: user.groupId
         }
         const msg: SocketData = {
-            type: SocketDataEnum.USER_DATA,
+            type: SocketEvent.USER_DATA,
             roomId: user.roomId,
             payload: userData
         }
@@ -67,7 +68,7 @@ const startGame = function (user: User, groupId: string, socket: WebSocket) {
         groupId: user.groupId
     }
     const msg: SocketData = {
-        type: SocketDataEnum.START_GAME,
+        type: SocketEvent.START_GAME,
         roomId: user.roomId,
         payload: userData
     }
@@ -83,7 +84,7 @@ const moveUserToGroup = function (user: User, groupId: string, socket: WebSocket
         groupId: groupId
     }
     const msg: SocketData = {
-        type: SocketDataEnum.USER_CHANGES_GROUP,
+        type: SocketEvent.USER_CHANGES_GROUP,
         roomId: user.roomId,
         payload: userData
     }
@@ -95,12 +96,14 @@ $(document).ready(function () {
     // Create a user
     const user: User = createUser("unknown");
 
+    // Start the game.
+    const game = new Game(new Map(), 30);
+    game.display();
+
+    /*
     // Open model to give username.
     dom.hideAllExcept(["#name-modal"]);
     $("#name-editor").focus();
-
-    // Start the game.
-    game();
 
     // Web socket.
     if (window["WebSocket"]) {
@@ -146,7 +149,7 @@ $(document).ready(function () {
             socket.onmessage = function (e) {
                 const data: SocketData = JSON.parse(e.data);
 
-                if (data.type == SocketDataEnum.USER_DATA) {
+                if (data.type == SocketEvent.USER_DATA) {
                     const payload: UserData = data.payload;
                     if (payload.name) {
                         user.name = payload.name;
@@ -155,10 +158,10 @@ $(document).ready(function () {
                     user.roomId = payload.roomId;
                     user.groupId = payload.groupId;
 
-                } else if (data.type == SocketDataEnum.CHAT_MESSAGE) {
+                } else if (data.type == SocketEvent.CHAT_MESSAGE) {
                     chat.receiveMsg(data.payload);
 
-                } else if (data.type == SocketDataEnum.USER_CHANGES_GROUP) {
+                } else if (data.type == SocketEvent.USER_CHANGES_GROUP) {
                     const payload: UserData = data.payload;
                     if (payload.userId == user.id) {
                         user.groupId = payload.groupId;
@@ -204,4 +207,5 @@ $(document).ready(function () {
             })
         };
     }
+    */
 });

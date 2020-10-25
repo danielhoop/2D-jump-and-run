@@ -2,7 +2,7 @@ import * as ws from "ws";
 import * as _ from "lodash";
 
 import {
-    SocketDataEnum,
+    SocketEvent,
     SocketData,
     constants,
     UserData
@@ -111,7 +111,7 @@ server.on("connection", function (socket) {
     }
 
     const msg: SocketData = {
-        type: SocketDataEnum.USER_DATA,
+        type: SocketEvent.USER_DATA,
         payload: initialUserData
     }
     socket.send(JSON.stringify(msg));
@@ -154,7 +154,7 @@ server.on("connection", function (socket) {
         console.log(msgData);
 
         // This case is primarily to update the name of the user on the server side.
-        if (msgData.type == SocketDataEnum.USER_DATA) {
+        if (msgData.type == SocketEvent.USER_DATA) {
             const uData: UserData = msgData.payload;
             if (userId == uData.userId) {
                 userDataList[userId].user.name = uData.name;
@@ -164,13 +164,13 @@ server.on("connection", function (socket) {
         }
 
         // Here, a user tells all other users that he/she changes groups.
-        if (msgData.type == SocketDataEnum.USER_CHANGES_GROUP) {
+        if (msgData.type == SocketEvent.USER_CHANGES_GROUP) {
             const uData: UserData = msgData.payload;
             moveUserToGroup(userId, uData.groupId);
         }
 
         // Take all members of a group and put them into a new room.
-        if (msgData.type == SocketDataEnum.START_GAME) {
+        if (msgData.type == SocketEvent.START_GAME) {
             const uData: UserData = msgData.payload;
             if (uData.groupId == constants.GROUP_0 || userFromList.user.groupId == constants.GROUP_0) {
                 return;

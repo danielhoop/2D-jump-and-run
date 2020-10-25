@@ -57,6 +57,16 @@ footer {
     border-radius: 5px;
   }
 
+#game {
+    width: 768px;
+    height: 400px;
+    visibility: hidden;
+    position: relative;
+    /*position: absolute;
+    top: 30px;
+    left: 30px;*/
+}
+
 #group-container {
     background: rgba(187, 187, 187, 0.5);
     position: absolute;

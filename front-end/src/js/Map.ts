@@ -7,37 +7,151 @@
 // animal: probability of animal.
 // food: probability of food.
 
-interface Field {
-    isTrail: boolean,
-    background: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number
+export interface MapData {
+    content: MapContent,
+    meta: MapMetaData
 }
 
-const mapCreator = function (mapLength: number, mapWidth: number, trailWidth: number, multiplier: number, dir: number, stone: number, animal: number, food: number): Array<Array<Field>> {
-    const MARGIN = 0;
-    const TRAIL = "../img/trail.png";
-    const GRASS = "../img/grass.png";
-    const STONE = "../img/stone.png";
-    const BIRD1 = "../img/bird-1.png";
-    const BIRD2 = "../img/bird-2.png";
-    const APPLE = "../img/apple.png";
-    const BANANA = "../img/banana.png";
+export type MapContent = Array<Array<Field>>;
 
-    const create = function (backgroundPath: string, x: number, y: number, isTrail = false): Field {
+export enum FieldType {
+    TRAIL = "TRAIL",
+    NON_TRAIL = "NON_TRAIL",
+    OBSTACLE = "OBSTACLE",
+    FOOD = "FOOD"
+}
+
+export enum ImageType {
+    TRAIL = "TRAIL",
+    GRASS = "GRASS",
+    STONE = "STONE",
+    BIRD1 = "BIRD1",
+    BIRD2 = "BIRD2",
+    APPLE = "APPLE",
+    BANANA = "BANANA"
+}
+
+export interface Field {
+    isTrail: boolean,
+    type: FieldType,
+    image: ImageType,
+    x: number,
+    y: number
+}
+
+export interface Coord {
+    x: number,
+    y: number
+}
+
+export interface MapMetaData {
+    mapLength: number,
+    mapWidth: number,
+    trailWidth: number,
+    multiplier: number
+}
+
+export class Map {
+
+    _content: MapContent;
+    _meta: MapMetaData;
+
+    _canvas: HTMLCanvasElement;
+    _ctx: CanvasRenderingContext2D;
+    _imgToPath: Record<ImageType, string> = {
+        [ImageType.TRAIL]: "./img/trail.png",
+        [ImageType.GRASS]: "./img/grass.png",
+        [ImageType.STONE]: "./img/stone.png",
+        [ImageType.BIRD1]: "./img/bird-1.png",
+        [ImageType.BIRD2]: "./img/bird-2.png",
+        [ImageType.APPLE]: "./img/apple.png",
+        [ImageType.BANANA]: "./img/banana.png"
+    }
+    _imgLoaded = 0;
+
+    allImgLoaded = false;
+
+    constructor() {
+        this._meta = {mapLength: 40.00000, mapWidth: 10.00000, trailWidth: 2.00000000, multiplier: 30}
+        //                       mapLength, mapWidth, trailWidth, dir, stone, animal, food
+        this._content = createMap(40.00000, 10.00000, 2.00000000, 1.0, 0.100, 0.0500, 0.10);
+        this._canvas = document.getElementById("game") as HTMLCanvasElement;
+        this._ctx = this._canvas.getContext("2d");
+    }
+
+    createImg = (src: string): string => {
+        return src;
+    }
+
+    setMap(map: MapData): void {
+        this._content = map.content;
+        this._meta = map.meta;
+    }
+
+    draw(): void {
+        const content = this._content;
+        const m = this._meta.multiplier;
+        for (let y = 0; y < content.length; y++) {
+            for (let x = 0; x < content[y].length; x++) {
+                const field = content[y][x];
+                const img = new Image();
+                img.onload = () => {
+                    // Drawing the image with coordinates pointing to top-left corner.
+                    this._ctx.drawImage(img, field.x * m, (field.y + 1) * m, m, m);
+                }
+            }
+        }
+    }
+
+    getStartingPoint(): Coord {
         return {
-            isTrail: isTrail || backgroundPath === TRAIL,
-            background: backgroundPath,
+            x: this._content[1].length / 2,
+            y: 0
+        };
+        /*const firstLine = this._content[0];
+        for (let i=0; i<firstLine.length; i++) {
+            if (firstLine[i].type === FieldType.TRAIL) {
+                return {
+                    x: i*this._meta.multiplier + this._meta.trailWidth,
+                    y: 0
+                }
+            }
+        }*/
+    }
+}
+
+export const createMap = function (mapLength: number, mapWidth: number, trailWidth: number, dir: number, stone: number, animal: number, food: number): MapContent {
+    const MARGIN = 0;
+    const TRAIL = ImageType.TRAIL;
+    const GRASS = ImageType.GRASS;
+    const STONE = ImageType.STONE;
+    const BIRD1 = ImageType.BIRD1;
+    const BIRD2 = ImageType.BIRD2;
+    const APPLE = ImageType.APPLE;
+    const BANANA = ImageType.BANANA;
+
+    const create = function (img: ImageType, x: number, y: number, isTrail = false): Field {
+        let type: FieldType;
+        if (img === GRASS) {
+            type = FieldType.NON_TRAIL;
+        } else if (img === APPLE || img === BANANA) {
+            type = FieldType.FOOD;
+        } else if (img === TRAIL) {
+            type = FieldType.TRAIL;
+        } else {
+            type = FieldType.OBSTACLE;
+        }
+
+        return {
+            isTrail: isTrail || img === TRAIL,
+            type: type,
+            image: img,
             y: y,
-            x: x,
-            width: multiplier,
-            height: multiplier
+            x: x
         };
     }
 
-    const createRandomElement = function (alternative: string, x: number, y: number, isTrail = false): Field {
+    const createRandomElement = function (alternative: ImageType, x: number, y: number, isTrail = false): Field {
         if (Math.random() <= stone) {
             return create(STONE, x, y, isTrail);
 
@@ -189,5 +303,3 @@ const mapCreator = function (mapLength: number, mapWidth: number, trailWidth: nu
     console.log(mp);
     return mp;
 }
-
-export default mapCreator;
