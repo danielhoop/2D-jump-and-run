@@ -11,6 +11,7 @@ import {
 type Players = Record<string, Coord>;
 
 class Game {
+    // Canvas viewport https://stackoverflow.com/questions/16919601/html5-canvas-camera-viewport-how-to-actually-do-it
 
     _multiplier: number;
     _player: Coord;
@@ -28,12 +29,10 @@ class Game {
         };
         this._canvas = document.getElementById("game") as HTMLCanvasElement;
         this._ctx = this._canvas.getContext("2d");
+        this._map.setCanvas(this._canvas);
 
         const canvas = this._canvas;
         const ctx = this._ctx;
-
-        //ctx.fillStyle = "blue";
-        //ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         canvas.addEventListener("keydown", (event) => {
             const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"

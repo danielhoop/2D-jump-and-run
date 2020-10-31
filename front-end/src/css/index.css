@@ -58,8 +58,8 @@ footer {
   }
 
 #game {
-    width: 768px;
-    height: 400px;
+    width: 1000px;
+    /*height: 800px;*/
     visibility: hidden;
     position: relative;
     /*position: absolute;

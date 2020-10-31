@@ -49,6 +49,10 @@ export interface MapMetaData {
     mapWidth: number,
     trailWidth: number,
     multiplier: number
+    dir: number,
+    stone: number,
+    animal: number,
+    food: number
 }
 
 export class Map {
@@ -58,28 +62,34 @@ export class Map {
 
     _canvas: HTMLCanvasElement;
     _ctx: CanvasRenderingContext2D;
-    _imgToPath: Record<ImageType, string> = {
-        [ImageType.TRAIL]: "./img/trail.png",
-        [ImageType.GRASS]: "./img/grass.png",
-        [ImageType.STONE]: "./img/stone.png",
-        [ImageType.BIRD1]: "./img/bird-1.png",
-        [ImageType.BIRD2]: "./img/bird-2.png",
-        [ImageType.APPLE]: "./img/apple.png",
-        [ImageType.BANANA]: "./img/banana.png"
-    }
-    _imgLoaded = 0;
-
-    allImgLoaded = false;
 
     constructor() {
-        this._meta = {mapLength: 40.00000, mapWidth: 10.00000, trailWidth: 2.00000000, multiplier: 30}
-        //                       mapLength, mapWidth, trailWidth, dir, stone, animal, food
-        this._content = createMap(40.00000, 10.00000, 2.00000000, 1.0, 0.100, 0.0500, 0.10);
-        this._canvas = document.getElementById("game") as HTMLCanvasElement;
+        this._meta = {
+            mapLength: 40.00000, mapWidth: 10.00000, trailWidth: 2.00000000, multiplier: 10,
+            dir: 1.0000, stone: 0.100, animal: 0.0500, food: 0.10
+        }
+        this._content = createMap(this._meta);
+    }
+
+    _imgToPath(type: ImageType): string {
+        const translation: Record<ImageType, string> = {
+            [ImageType.TRAIL]: "./img/trail.png",
+            [ImageType.GRASS]: "./img/grass.png",
+            [ImageType.STONE]: "./img/stone.png",
+            [ImageType.BIRD1]: "./img/bird-1.png",
+            [ImageType.BIRD2]: "./img/bird-2.png",
+            [ImageType.APPLE]: "./img/apple.png",
+            [ImageType.BANANA]: "./img/banana.png"
+        }
+        return translation[type];
+    }
+
+    setCanvas(canvas: HTMLCanvasElement): void {
+        this._canvas = canvas;
         this._ctx = this._canvas.getContext("2d");
     }
 
-    createImg = (src: string): string => {
+    createImg(src: string): string {
         return src;
     }
 
@@ -94,11 +104,27 @@ export class Map {
         for (let y = 0; y < content.length; y++) {
             for (let x = 0; x < content[y].length; x++) {
                 const field = content[y][x];
+                // First the background.
+                if (field.image != ImageType.TRAIL && field.image != ImageType.GRASS) {
+                    const imgBg = new Image();
+                    imgBg.onload = () => {
+                        // Drawing the image with coordinates pointing to top-left corner.
+                        this._ctx.drawImage(imgBg, field.x * m, (field.y + 1) * m, m, m);
+                    }
+                    if (field.isTrail) {
+                        imgBg.src = this._imgToPath(ImageType.TRAIL);
+                    } else {
+                        imgBg.src = this._imgToPath(ImageType.GRASS);
+                    }
+                    
+                }
+                // Then the object
                 const img = new Image();
                 img.onload = () => {
                     // Drawing the image with coordinates pointing to top-left corner.
                     this._ctx.drawImage(img, field.x * m, (field.y + 1) * m, m, m);
                 }
+                img.src = this._imgToPath(field.image);
             }
         }
     }
@@ -120,7 +146,9 @@ export class Map {
     }
 }
 
-export const createMap = function (mapLength: number, mapWidth: number, trailWidth: number, dir: number, stone: number, animal: number, food: number): MapContent {
+export const createMap = function (param: MapMetaData): MapContent {
+    const { mapLength, mapWidth, trailWidth, dir, stone, animal, food } = param;
+
     const MARGIN = 0;
     const TRAIL = ImageType.TRAIL;
     const GRASS = ImageType.GRASS;
