@@ -13,7 +13,8 @@ import {
     UserData,
     constants
 } from "./types";
-import { Map } from "./Map";
+import { Map, MapMetaData } from "./Map";
+import { Player } from "./Player";
 
 const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
     const name = $("#name-editor").val().toString();
@@ -97,7 +98,15 @@ $(document).ready(function () {
     const user: User = createUser("unknown");
 
     // Start the game.
-    const game = new Game(new Map(), 30);
+    const meta: MapMetaData = {
+        mapLength: 40.00000, mapWidth: 10.00000, trailWidth: 2.00000000, multiplier: 40,
+        dir: 1.0000, stone: 0.100, animal: 0.0500, food: 0.10
+    };
+
+    const game = new Game(
+        new Map(meta),
+        new Player(meta, user.id),
+        meta.multiplier);
     game.display();
 
     /*

@@ -1,11 +1,4 @@
-// mapLength: length of map
-// mapWidth: width of map
-// trailWidth: width of trail
-// multiplier: pixel multiplier. Size of one square.
-// dir: probability of change in direction.
-// stone: probability of stone.
-// animal: probability of animal.
-// food: probability of food.
+import { map } from "jquery";
 
 export interface MapData {
     content: MapContent,
@@ -34,9 +27,7 @@ export enum ImageType {
 export interface Field {
     isTrail: boolean,
     type: FieldType,
-    image: ImageType,
-    x: number,
-    y: number
+    image: ImageType
 }
 
 export interface Coord {
@@ -63,12 +54,11 @@ export class Map {
     _canvas: HTMLCanvasElement;
     _ctx: CanvasRenderingContext2D;
 
-    constructor() {
-        this._meta = {
-            mapLength: 40.00000, mapWidth: 10.00000, trailWidth: 2.00000000, multiplier: 10,
-            dir: 1.0000, stone: 0.100, animal: 0.0500, food: 0.10
-        }
+    constructor(metaData: MapMetaData) {
+        this._meta = metaData;
         this._content = createMap(this._meta);
+        this._canvas = document.getElementById("map") as HTMLCanvasElement;
+        this._ctx = this._canvas.getContext("2d");
     }
 
     _imgToPath(type: ImageType): string {
@@ -84,13 +74,8 @@ export class Map {
         return translation[type];
     }
 
-    setCanvas(canvas: HTMLCanvasElement): void {
-        this._canvas = canvas;
-        this._ctx = this._canvas.getContext("2d");
-    }
-
-    createImg(src: string): string {
-        return src;
+    getCanvas(): HTMLCanvasElement {
+        return this._canvas;
     }
 
     setMap(map: MapData): void {
@@ -109,20 +94,20 @@ export class Map {
                     const imgBg = new Image();
                     imgBg.onload = () => {
                         // Drawing the image with coordinates pointing to top-left corner.
-                        this._ctx.drawImage(imgBg, field.x * m, (field.y + 1) * m, m, m);
+                        this._ctx.drawImage(imgBg, x * m, y * m, m, m);
                     }
                     if (field.isTrail) {
                         imgBg.src = this._imgToPath(ImageType.TRAIL);
                     } else {
                         imgBg.src = this._imgToPath(ImageType.GRASS);
                     }
-                    
+
                 }
                 // Then the object
                 const img = new Image();
                 img.onload = () => {
                     // Drawing the image with coordinates pointing to top-left corner.
-                    this._ctx.drawImage(img, field.x * m, (field.y + 1) * m, m, m);
+                    this._ctx.drawImage(img, x * m, y * m, m, m);
                 }
                 img.src = this._imgToPath(field.image);
             }
@@ -146,6 +131,14 @@ export class Map {
     }
 }
 
+// mapLength: length of map
+// mapWidth: width of map
+// trailWidth: width of trail
+// multiplier: pixel multiplier. Size of one square.
+// dir: probability of change in direction.
+// stone: probability of stone.
+// animal: probability of animal.
+// food: probability of food.
 export const createMap = function (param: MapMetaData): MapContent {
     const { mapLength, mapWidth, trailWidth, dir, stone, animal, food } = param;
 
@@ -173,9 +166,7 @@ export const createMap = function (param: MapMetaData): MapContent {
         return {
             isTrail: isTrail || img === TRAIL,
             type: type,
-            image: img,
-            y: y,
-            x: x
+            image: img
         };
     }
 
@@ -328,6 +319,15 @@ export const createMap = function (param: MapMetaData): MapContent {
         mp[y] = line;
     }
 
-    console.log(mp);
-    return mp;
+    // Make map upside down
+    const mpInv: Array<Array<Field>> = [];
+    const subtr = mapLength - 1;
+    for (let y = 0; y < mapLength; y++) {
+        console.log("y = " + y + ", rev = " + (subtr - y));
+        mpInv[y] = mp[subtr - y];
+        console.log(mpInv[y]);
+    }
+
+    console.log(mpInv)
+    return mpInv;
 }

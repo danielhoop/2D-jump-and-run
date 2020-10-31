@@ -13,7 +13,8 @@ export enum SocketEvent {
     CHAT_MESSAGE = "CHAT_MESSAGE",
     USER_DATA = "USER_DATA",
     USER_CHANGES_GROUP = "USER_CHANGES_GROUP",
-    START_GAME = "START_GAME"
+    START_GAME = "START_GAME",
+    PLAYER_POSITION_UPDATE = "PLAYER_POSITION_UPDATE"
 }
 
 export interface UserData {
@@ -29,4 +30,10 @@ export interface SocketData {
     recipientIds?: Array<string>,
     roomId?: string;
     payload: any
+}
+
+export interface PlayerPosition {
+    userId: string,
+    x: number,
+    y: number
 }

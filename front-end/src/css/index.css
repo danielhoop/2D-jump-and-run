@@ -57,15 +57,18 @@ footer {
     border-radius: 5px;
   }
 
-#game {
-    width: 1000px;
-    /*height: 800px;*/
-    visibility: hidden;
-    position: relative;
-    /*position: absolute;
+.game-canvas {
+    /*width: 1200px;*/
+    height: 70%;
+    /*visibility: hidden;*/
+    position: absolute;
     top: 30px;
-    left: 30px;*/
+    left: 30px;
 }
+
+/*#player1 {
+    z-index: 1;
+}*/
 
 #group-container {
     background: rgba(187, 187, 187, 0.5);
@@ -108,10 +111,6 @@ footer {
 }
 
 #name-modal {
-    visibility: hidden;
-}
-
-#game {
     visibility: hidden;
 }
 

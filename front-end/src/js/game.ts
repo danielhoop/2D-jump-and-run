@@ -7,6 +7,7 @@ import {
     MapData,
     Coord
 } from "./Map";
+import { Player } from "./Player";
 
 type Players = Record<string, Coord>;
 
@@ -14,27 +15,22 @@ class Game {
     // Canvas viewport https://stackoverflow.com/questions/16919601/html5-canvas-camera-viewport-how-to-actually-do-it
 
     _multiplier: number;
-    _player: Coord;
+    _player: Player;
     _players: Players;
     _map: Map;
     _canvas: HTMLCanvasElement;
     _ctx: CanvasRenderingContext2D;
 
-    constructor(map: Map, multiplier: number) {
+    constructor(map: Map, player: Player, multiplier: number) {
         this._map = map;
         this._multiplier = multiplier;
-        this._player = map.getStartingPoint();
+        this._player = player;
+        this
         this._players = {
             "129387129487124": map.getStartingPoint()
         };
-        this._canvas = document.getElementById("game") as HTMLCanvasElement;
-        this._ctx = this._canvas.getContext("2d");
-        this._map.setCanvas(this._canvas);
 
-        const canvas = this._canvas;
-        const ctx = this._ctx;
-
-        canvas.addEventListener("keydown", (event) => {
+        this._map.getCanvas().addEventListener("keydown", (event) => {
             const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
             if (key == "ArrowRight") {
                 //
@@ -57,7 +53,12 @@ class Game {
         // https://stackoverflow.com/questions/16919601/html5-canvas-camera-viewport-how-to-actually-do-it
 
         this._map.draw();
-        dom.hideAllExcept(["#game"]);
+        dom.hideAllExcept([
+            "#map",
+            "#palyer1",
+            "#palyer2",
+            "#palyer3",
+        ]);
     }
 }
 
