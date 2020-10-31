@@ -48,11 +48,11 @@ export interface MapMetaData {
 
 export class Map {
 
-    _content: MapContent;
-    _meta: MapMetaData;
+    private _content: MapContent;
+    private _meta: MapMetaData;
 
-    _canvas: HTMLCanvasElement;
-    _ctx: CanvasRenderingContext2D;
+    private _canvas: HTMLCanvasElement;
+    private _ctx: CanvasRenderingContext2D;
 
     constructor(metaData: MapMetaData) {
         this._meta = metaData;
@@ -323,11 +323,8 @@ export const createMap = function (param: MapMetaData): MapContent {
     const mpInv: Array<Array<Field>> = [];
     const subtr = mapLength - 1;
     for (let y = 0; y < mapLength; y++) {
-        console.log("y = " + y + ", rev = " + (subtr - y));
         mpInv[y] = mp[subtr - y];
-        console.log(mpInv[y]);
     }
 
-    console.log(mpInv)
     return mpInv;
 }
