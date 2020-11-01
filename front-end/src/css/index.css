@@ -58,13 +58,21 @@ footer {
     border-radius: 5px;
   }
 
-.game-canvas {
+.game-canvas2 {
     /*width: 1200px;*/
     height: 70%;
     /*visibility: hidden;*/
     position: absolute;
     top: 30px;
     left: 30px;
+}
+
+/* https://stackoverflow.com/questions/982054/how-to-center-an-element-in-the-middle-of-the-browser-window */
+.game-canvas {
+    width: 30%;
+    position: absolute;
+    left: 50%;
+    margin-left: -15%;
 }
 
 #gamepad {

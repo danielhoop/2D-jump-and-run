@@ -1,3 +1,5 @@
+import $ from "jquery";
+
 import { Map } from "./Map";
 import { constants, PlayerPosition } from "./types";
 
@@ -85,10 +87,6 @@ export class Player {
             // Reset collision and jumping information.
             this._isJumping = !(this._yAtLastJump - this._y > this._JUMP_DISTANCE);
             this._hasJustCollided = !(this._yAtLastCollision - this._y > this._COLLISON_DISTANCE);
-            /*console.log("this._yAtLastJump - this._y: " + (this._yAtLastJump - this._y));
-            console.log("this._yAtLastCollision - this._y: " + (this._yAtLastCollision - this._y));
-            console.log("this._isJumping: " + this._isJumping);
-            console.log("this._hasJustCollided: " + this._hasJustCollided);*/
 
             // Draw the avatar
             const m = this._map.getMapData().meta.multiplier;
@@ -120,6 +118,22 @@ export class Player {
                     this.increaseVelocity();
                 }
             }
+
+            // Scroll to right place
+            const viewPortHeight = $(window).height();
+            const documentHeight = $(document).height();
+            const partOfPathTaken = 1 - (this._y / this._map.getMapData().meta.mapLength);
+            const pixelsWalked = partOfPathTaken * documentHeight;
+            let scrollToHeight  = documentHeight;
+            if (pixelsWalked > viewPortHeight / 2) {
+                scrollToHeight = documentHeight - pixelsWalked - viewPortHeight / 2;
+            }
+            window.scrollTo(0, scrollToHeight);
+            /*console.log("documentHeight: " + documentHeight);
+            console.log("viewPortHeight: " + viewPortHeight);
+            console.log("partOfPathTaken: " + partOfPathTaken);
+            console.log("pixelsWalked: " + pixelsWalked);
+            console.log("scrollToHeight: " + scrollToHeight);*/
         }
     }
 

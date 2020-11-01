@@ -14,7 +14,7 @@ type Players = Record<string, Coord>;
 class Game {
     // Canvas viewport https://stackoverflow.com/questions/16919601/html5-canvas-camera-viewport-how-to-actually-do-it
 
-    private _FPS = 12;
+    private _FPS = 15;
     private _INTERVAL = 1000 / this._FPS; // milliseconds
 
     private _multiplier: number;
