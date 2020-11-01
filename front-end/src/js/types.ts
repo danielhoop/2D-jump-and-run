@@ -7,6 +7,9 @@ export const constants = {
     BUTTON_GROUP_1: "button-group-id-1",
     BUTTON_GROUP_2: "button-group-id-2",
     BUTTON_GROUP_3: "button-group-id-3",
+    PLAYER_1: 1,
+    PLAYER_2: 2,
+    PLAYER_3: 3
 }
 
 export enum SocketEvent {

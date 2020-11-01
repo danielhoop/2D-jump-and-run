@@ -61,7 +61,7 @@ export class Map {
         this._ctx = this._canvas.getContext("2d");
     }
 
-    _imgToPath(type: ImageType): string {
+    private _imgToPath(type: ImageType): string {
         const translation: Record<ImageType, string> = {
             [ImageType.TRAIL]: "./img/trail.png",
             [ImageType.GRASS]: "./img/grass.png",
@@ -78,9 +78,12 @@ export class Map {
         return this._canvas;
     }
 
-    setMap(map: MapData): void {
+    setMapData(map: MapData): void {
         this._content = map.content;
         this._meta = map.meta;
+    }
+    getMapData(): MapData {
+        return { content: this._content, meta: this._meta };
     }
 
     draw(): void {
@@ -116,8 +119,8 @@ export class Map {
 
     getStartingPoint(): Coord {
         return {
-            x: this._content[1].length / 2,
-            y: 0
+            x: Math.floor(this._meta.mapWidth / 2),
+            y: this._meta.mapLength - 2
         };
         /*const firstLine = this._content[0];
         for (let i=0; i<firstLine.length; i++) {

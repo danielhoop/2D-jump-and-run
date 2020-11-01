@@ -105,7 +105,7 @@ $(document).ready(function () {
 
     const game = new Game(
         new Map(meta),
-        new Player(meta, user.id),
+        new Player(user.id, constants.PLAYER_1),
         meta.multiplier);
     game.display();
 

@@ -14,7 +14,7 @@ type Players = Record<string, Coord>;
 class Game {
     // Canvas viewport https://stackoverflow.com/questions/16919601/html5-canvas-camera-viewport-how-to-actually-do-it
 
-    private _FPS = 7;
+    private _FPS = 12;
     private _INTERVAL = 1000 / this._FPS; // milliseconds
 
     private _multiplier: number;
@@ -27,7 +27,7 @@ class Game {
         this._map = map;
         this._multiplier = multiplier;
 
-        player.setFps(this._FPS);
+        player.initialize(map.getMapData(), this._FPS)
         this._player = player;
 
         this._players = {
@@ -63,7 +63,7 @@ class Game {
     }
 
     setMap(mapData: MapData): void {
-        this._map.setMap(mapData);
+        this._map.setMapData(mapData);
     }
 
     display(): void {
