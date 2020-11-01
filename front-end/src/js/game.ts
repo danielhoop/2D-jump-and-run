@@ -27,7 +27,7 @@ class Game {
         this._map = map;
         this._multiplier = multiplier;
 
-        player.initialize(map.getMapData(), this._FPS)
+        player.initialize(map, this._FPS)
         this._player = player;
 
         this._players = {
@@ -54,12 +54,14 @@ class Game {
                 // Do nothing
             } else if (key == "ArrowDown") {
                 // Do nothing
+            } else if (key == " ") {
+                this._player.jump();
             }
         });
     }
 
     gameLoop(thisObject: Game): void {
-        thisObject._player.moveForward();
+        thisObject._player.gameLoop();
     }
 
     setMap(mapData: MapData): void {

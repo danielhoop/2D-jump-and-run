@@ -1,45 +1,58 @@
-import { MapContent, MapData, MapMetaData } from "./Map";
+import { Map } from "./Map";
 import { constants, PlayerPosition } from "./types";
 
 export class Player {
 
     private _userId: string;
     private _playerNo: number;
+    private _yAtLastCollision = 99999;
+    private _yAtLastJump = 99999;
+    private _hasJustCollided = false;
+    private _isJumping = false;
     private _x: number;
     private _y: number;
     private _FPS: number;
-    private _velocity = 4;
+    private _velocity: number;
     private _MIN_VELOCITY = 1;
     private _MAX_VELOCITY = 4;
-    private _FIELDS_PER_SECOND = 2;
-    private _meta: MapMetaData;
-    private _map: MapContent;
+    private _MAX_FIELDS_PER_SECOND = 4;
+    private _JUMP_DISTANCE = 2.3;
+    private _COLLISON_DISTANCE = 2.01;
+    private _map: Map;
     private _imgPath: string;
+    private _veloImgPath = "./img/velo-points.png";
     private _canvas: HTMLCanvasElement;
     private _ctx: CanvasRenderingContext2D;
+    private _veloCtx: CanvasRenderingContext2D;
 
     constructor(userId: string, playerNo: number) {
         this._userId = userId;
         this._playerNo = playerNo;
         this._imgPath = this.playerNoToImagePath();
-    }
 
-    initialize(mapData: MapData, fps: number, ): void {
-        this._meta = mapData.meta;
-        this._map = mapData.content;
-        this._FPS = fps;
-
-        if (this._velocity > this._MAX_VELOCITY) {
-            this._velocity = this._MAX_VELOCITY;
-        }
         this._canvas = document.getElementById(this.playerNoToHtml()) as HTMLCanvasElement;
         this._ctx = this._canvas.getContext("2d");
 
+        const pointsCanv = document.getElementById("points") as HTMLCanvasElement;
+        this._veloCtx = pointsCanv.getContext("2d");
+
+        this._velocity = 2;
+        if (this._velocity > this._MAX_VELOCITY) {
+            this._velocity = this._MAX_VELOCITY;
+        }
+    }
+
+    initialize(map: Map, fps: number): void {
+        this._map = map;
+        this._FPS = fps;
+
         this.updatePosition({
             userId: this._userId,
-            x: Math.floor(this._meta.mapWidth / 2),
-            y: this._meta.mapLength - 2
+            x: Math.floor(this._map.getMapData().meta.mapWidth / 2),
+            y: this._map.getMapData().meta.mapLength - 2
         });
+
+        this.drawVelocity();
     }
 
     private playerNoToHtml(): string {
@@ -57,43 +70,70 @@ export class Player {
         }[this._playerNo.toString()];
     }
 
-    setMap(map: MapContent): void {
-        this._map = map;
-    }
-
-    getCanvas(): HTMLCanvasElement {
+    /*getCanvas(): HTMLCanvasElement {
         return this._canvas;
-    }
+    }*/
 
     updatePosition(position: PlayerPosition): void {
         if (position.userId == this._userId) {
-            if (position.x >= this._meta.mapWidth || position.x < 0) {
+            if (position.x >= this._map.getMapData().meta.mapWidth || position.x < 0 || position.y < 0) {
                 return;
             }
             this._x = position.x;
             this._y = position.y;
-            // this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
-            const m = this._meta.multiplier;
+            // Reset collision and jumping information.
+            this._isJumping = !(this._yAtLastJump - this._y > this._JUMP_DISTANCE);
+            this._hasJustCollided = !(this._yAtLastCollision - this._y > this._COLLISON_DISTANCE);
+            /*console.log("this._yAtLastJump - this._y: " + (this._yAtLastJump - this._y));
+            console.log("this._yAtLastCollision - this._y: " + (this._yAtLastCollision - this._y));
+            console.log("this._isJumping: " + this._isJumping);
+            console.log("this._hasJustCollided: " + this._hasJustCollided);*/
+
+            // Draw the avatar
+            const m = this._map.getMapData().meta.multiplier;
             const img = new Image();
             img.onload = () => {
                 // Drawing the image with coordinates pointing to top-left corner.
                 this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-                this._ctx.drawImage(img, position.x * m, position.y * m, m, m);
+                if (this._isJumping) {
+                    // Shadow below figure. Figure is slightly larger than usually.
+                    this._ctx.fillStyle = "gray";
+                    this._ctx.fillRect(position.x * m - m * 0.40, position.y * m - m * 0.40, m * 1.60, m * 1.60);
+                    this._ctx.drawImage(img, position.x * m - m * 0.20, position.y * m - m * 0.20, m * 1.20, m * 1.20);
+                } else {
+                    // Normal sized figure.
+                    this._ctx.drawImage(img, position.x * m, position.y * m, m, m);
+                }
             }
             img.src = this._imgPath;
+
+            // Handle collisions
+            if (!this._isJumping) {
+                const playerCoord = { x: this._x, y: this._y };
+                if (!this._hasJustCollided && this._map.touchesObstacle(playerCoord)) {
+                    this._yAtLastCollision = this._y;
+                    this.decreaseVelocity();
+                    this._hasJustCollided = true;
+                }
+                if (this._map.touchesFood(playerCoord)) {
+                    this.increaseVelocity();
+                }
+            }
         }
     }
 
     // moveForward is called for each frame (game loop).
-    moveForward(): void {
+    gameLoop(): void {
+        this.moveForward();
+    }
+    private moveForward(): void {
         const position: PlayerPosition = { userId: this._userId, x: this._x, y: this._y }
-        console.log(position.y);
         if (position.y <= 0) {
             // TODO send message to socket that tells that player is at end of course.
             return;
         }
-        position.y = position.y - (this._velocity / this._MAX_VELOCITY * this._FIELDS_PER_SECOND / this._FPS);
+        position.y = position.y - (this._velocity / this._MAX_VELOCITY * this._MAX_FIELDS_PER_SECOND / this._FPS);
         this.updatePosition(position);
     }
     moveRight(): void {
@@ -107,16 +147,41 @@ export class Player {
         this.updatePosition(position);
     }
 
-    setVelocity(value: number): void {
-        if (value <= this._MIN_VELOCITY || value >= this._MAX_VELOCITY) {
+    jump(): void {
+        if (!this._isJumping) {
+            this._yAtLastJump = this._y;
+            // To draw immediately another picture. Even though position has not changed.
+            this.updatePosition({ userId: this._userId, x: this._x, y: this._y });
+        }
+    }
+
+    private setVelocity(value: number): void {
+        if (value < this._MIN_VELOCITY || value > this._MAX_VELOCITY) {
             return;
         }
         this._velocity = value;
+        this.drawVelocity();
     }
-    increaseVelocity(): void {
+    private increaseVelocity(): void {
         this.setVelocity(this._velocity + 1);
     }
-    decreaseVelocity(): void {
+    private decreaseVelocity(): void {
         this.setVelocity(this._velocity - 1);
+    }
+    private drawVelocity(y: number = undefined): void {
+        if (y === undefined) {
+            y = this._map.getMapData().meta.mapLength - 2;
+        }
+        const x = this._map.getMapData().meta.mapWidth - 2;
+        const m = this._map.getMapData().meta.multiplier;
+        const img = new Image();
+        img.onload = () => {
+            // Drawing the image with coordinates pointing to top-left corner.
+            this._veloCtx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+            for (let velo = this._MIN_VELOCITY; velo <= this._velocity; velo++) {
+                this._veloCtx.drawImage(img, x * m, (y - velo + 1) * m, m, m);
+            }
+        }
+        img.src = this._veloImgPath;
     }
 }

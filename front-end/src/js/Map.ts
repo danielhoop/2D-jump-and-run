@@ -61,7 +61,7 @@ export class Map {
         this._ctx = this._canvas.getContext("2d");
     }
 
-    private _imgToPath(type: ImageType): string {
+    private imgToPath(type: ImageType): string {
         const translation: Record<ImageType, string> = {
             [ImageType.TRAIL]: "./img/trail.png",
             [ImageType.GRASS]: "./img/grass.png",
@@ -74,9 +74,9 @@ export class Map {
         return translation[type];
     }
 
-    getCanvas(): HTMLCanvasElement {
+    /*getCanvas(): HTMLCanvasElement {
         return this._canvas;
-    }
+    }*/
 
     setMapData(map: MapData): void {
         this._content = map.content;
@@ -100,9 +100,9 @@ export class Map {
                         this._ctx.drawImage(imgBg, x * m, y * m, m, m);
                     }
                     if (field.isTrail) {
-                        imgBg.src = this._imgToPath(ImageType.TRAIL);
+                        imgBg.src = this.imgToPath(ImageType.TRAIL);
                     } else {
-                        imgBg.src = this._imgToPath(ImageType.GRASS);
+                        imgBg.src = this.imgToPath(ImageType.GRASS);
                     }
 
                 }
@@ -112,7 +112,7 @@ export class Map {
                     // Drawing the image with coordinates pointing to top-left corner.
                     this._ctx.drawImage(img, x * m, y * m, m, m);
                 }
-                img.src = this._imgToPath(field.image);
+                img.src = this.imgToPath(field.image);
             }
         }
     }
@@ -132,6 +132,55 @@ export class Map {
             }
         }*/
     }
+
+    private touchesSomething(coord: Coord, what: FieldType): Coord {
+        const cont = this._content;
+        for (let x = Math.max(0, Math.floor(coord.x)); x < coord.x + 1 && x < this._meta.mapWidth; x++) {
+            for (let y = Math.max(0, Math.floor(coord.y)); y < coord.y + 1 && y < this._meta.mapLength; y++) {
+                if (cont[y][x].type == what) {
+                    const dX = coord.x - x;
+                    const dY = coord.y - y;
+                    const xOverlap = -1 < dX && dX < 1;
+                    const yOverlap = -1 < dY && dY < 1;
+                    if (xOverlap && yOverlap) {
+                        // console.log("coord.x = " + x + ", coord.y = " + y + ", x = " + x + ", y = " + y + ". Has touched: ", what);
+                        return { x: x, y: y };
+                    }
+                }
+            }
+        }
+        return { x: -1, y: -1 };
+    }
+
+    touchesObstacle(coord: Coord): boolean {
+        return this.touchesSomething(coord, FieldType.NON_TRAIL).x != -1
+            || this.touchesSomething(coord, FieldType.OBSTACLE).x != -1;
+    }
+    touchesFood(coord: Coord): boolean {
+        const food = this.touchesSomething(coord, FieldType.FOOD);
+        if (food.x != -1) {
+            const x = food.x;
+            const y = food.y;
+            const m = this._meta.multiplier;
+            const field = this._content[y][x];
+            const imgBg = new Image();
+            imgBg.onload = () => {
+                // Drawing the image with coordinates pointing to top-left corner.
+                this._ctx.drawImage(imgBg, x * m, y * m, m, m);
+            }
+            if (field.isTrail) {
+                field.type = FieldType.TRAIL;
+                imgBg.src = this.imgToPath(ImageType.TRAIL);
+            } else {
+                field.type = FieldType.NON_TRAIL;
+                imgBg.src = this.imgToPath(ImageType.GRASS);
+            }
+            // TODO: Send update of field to other players.
+            return true;
+        }
+        return false;
+    }
+
 }
 
 // mapLength: length of map
