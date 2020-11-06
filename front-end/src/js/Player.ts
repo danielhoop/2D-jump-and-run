@@ -35,8 +35,8 @@ export class Player {
         this._canvas = document.getElementById(this.playerNoToHtml()) as HTMLCanvasElement;
         this._ctx = this._canvas.getContext("2d");
 
-        const pointsCanv = document.getElementById("velocity") as HTMLCanvasElement;
-        this._veloCtx = pointsCanv.getContext("2d");
+        const veloCanv = document.getElementById("velocity") as HTMLCanvasElement;
+        this._veloCtx = veloCanv.getContext("2d");
 
         this._velocity = 2;
         if (this._velocity > this._MAX_VELOCITY) {

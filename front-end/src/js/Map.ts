@@ -1,4 +1,4 @@
-import { map } from "jquery";
+import $ from "jquery";
 
 export interface MapData {
     content: MapContent,
@@ -48,6 +48,14 @@ export interface MapMetaData {
 
 export class Map {
 
+    private _GAME_ELEMENTS = [
+        "#map",
+        "#palyer1",
+        "#palyer2",
+        "#palyer3",
+        "#velocity",
+        "#gamepad"];
+    
     private _content: MapContent;
     private _meta: MapMetaData;
 
@@ -55,8 +63,7 @@ export class Map {
     private _ctx: CanvasRenderingContext2D;
 
     constructor(metaData: MapMetaData) {
-        this._meta = metaData;
-        this._content = createMap(this._meta);
+        this.createNewMap(metaData);
         this._canvas = document.getElementById("map") as HTMLCanvasElement;
         this._ctx = this._canvas.getContext("2d");
     }
@@ -78,9 +85,9 @@ export class Map {
         return this._canvas;
     }*/
 
-    setMapData(map: MapData): void {
-        this._content = map.content;
-        this._meta = map.meta;
+    createNewMap(metaData: MapMetaData): void {
+        this._meta = metaData;
+        this._content = createMap(this._meta);
     }
     getMapData(): MapData {
         return { content: this._content, meta: this._meta };

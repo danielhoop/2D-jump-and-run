@@ -1,42 +1,35 @@
-import $ from "jquery";
-
 import dom from "./dom-operator";
 
 import {
     Map,
-    MapData,
-    Coord
+    MapMetaData
 } from "./Map";
 import { Player } from "./Player";
 
-type Players = Record<string, Coord>;
+type Players = Record<string, unknown>;
 
 class Game {
     // Canvas viewport https://stackoverflow.com/questions/16919601/html5-canvas-camera-viewport-how-to-actually-do-it
 
     private _FPS = 15;
     private _INTERVAL = 1000 / this._FPS; // milliseconds
+    private _GAME_ELEMENTS = [
+        "#map",
+        "#palyer1",
+        "#palyer2",
+        "#palyer3",
+        "#velocity",
+        "#gamepad"];
 
-    private _multiplier: number;
     private _player: Player;
     private _players: Players;
     private _map: Map;
     private _canvas: HTMLCanvasElement;
 
-    constructor(map: Map, player: Player, multiplier: number) {
-        this._map = map;
-        this._multiplier = multiplier;
-
-        player.initialize(map, this._FPS)
+    constructor(player: Player, players: Players) {
         this._player = player;
-
-        this._players = {
-            "129387129487124": map.getStartingPoint()
-        };
-
-        setInterval(() => {
-            this.gameLoop(this)
-        }, this._INTERVAL);
+        this._players = players;
+        this.setLevel1();
 
         //this._map.getCanvas().addEventListener("keydown", (event) => {
         document.getElementById("gamepad").addEventListener("klck", (event) => {
@@ -60,27 +53,38 @@ class Game {
         });
     }
 
-    gameLoop(thisObject: Game): void {
+    start(): void {
+        setInterval(() => {
+            this.gameLoop(this)
+        }, this._INTERVAL);
+
+        this._map.draw();
+        dom.hideAllExcept(this._GAME_ELEMENTS);
+    }
+
+    private gameLoop(thisObject: Game): void {
         thisObject._player.gameLoop();
     }
 
-    setMap(mapData: MapData): void {
-        this._map.setMapData(mapData);
+    private setMap(meta: MapMetaData): void {
+        if (this._map == undefined) {
+            this._map = new Map(meta);
+        } else {
+            this._map.createNewMap(meta);
+        }
+        this._player.initialize(this._map, this._FPS)
+        /* TODO: Uncomment this, when other players work.
+        for (const key in this._players) {
+            this._players[key].initialize(this._map, this._FPS);
+        } */
     }
 
-    display(): void {
-        // How to set the viewport?
-        // https://stackoverflow.com/questions/16919601/html5-canvas-camera-viewport-how-to-actually-do-it
-
-        this._map.draw();
-        dom.hideAllExcept([
-            "#map",
-            "#palyer1",
-            "#palyer2",
-            "#palyer3",
-            "#velocity",
-            "#gamepad"
-        ]);
+    private setLevel1(): void {
+        const meta: MapMetaData = {
+            // Backup that works: mapLength: 40, mapWidth: 10, trailWidth: 2, multiplier: 40, dir: 1, stone: 0.1, animal: 0.05, food: 0.10
+            mapLength: 40, mapWidth: 10, trailWidth: 2, multiplier: 40, dir: 1, stone: 0.1, animal: 0.05, food: 0.10
+        };
+        this.setMap(meta);
     }
 }
 
