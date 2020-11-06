@@ -9,6 +9,7 @@ const allElementsOnPage: Array<string> = [
     "#palyer1",
     "#palyer2",
     "#palyer3",
+    "#velocity",
     "#gamepad",
     "#chat",
     "#chat-open-button"

@@ -35,7 +35,7 @@ export class Player {
         this._canvas = document.getElementById(this.playerNoToHtml()) as HTMLCanvasElement;
         this._ctx = this._canvas.getContext("2d");
 
-        const pointsCanv = document.getElementById("points") as HTMLCanvasElement;
+        const pointsCanv = document.getElementById("velocity") as HTMLCanvasElement;
         this._veloCtx = pointsCanv.getContext("2d");
 
         this._velocity = 2;
@@ -140,6 +140,7 @@ export class Player {
     // moveForward is called for each frame (game loop).
     gameLoop(): void {
         this.moveForward();
+        this.drawVelocity();
     }
     private moveForward(): void {
         const position: PlayerPosition = { userId: this._userId, x: this._x, y: this._y }
@@ -184,7 +185,12 @@ export class Player {
     }
     private drawVelocity(y: number = undefined): void {
         if (y === undefined) {
-            y = this._map.getMapData().meta.mapLength - 2;
+            if (this._y < this._map.getMapData().meta.mapLength - this._MAX_VELOCITY - 3) {
+                y = this._y + this._MAX_VELOCITY + 1
+            }
+            if (y === undefined) {
+                y = this._map.getMapData().meta.mapLength - 2;
+            }
         }
         const x = this._map.getMapData().meta.mapWidth - 2;
         const m = this._map.getMapData().meta.multiplier;

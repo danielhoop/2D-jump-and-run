@@ -78,6 +78,7 @@ class Game {
             "#palyer1",
             "#palyer2",
             "#palyer3",
+            "#velocity",
             "#gamepad"
         ]);
     }
