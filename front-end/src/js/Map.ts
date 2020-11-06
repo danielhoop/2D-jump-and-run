@@ -55,12 +55,32 @@ export class Map {
         "#player3",
         "#velocity",
         "#gamepad"];
-    
+
     private _content: MapContent;
     private _meta: MapMetaData;
 
     private _canvas: HTMLCanvasElement;
     private _ctx: CanvasRenderingContext2D;
+
+    private _allImagesInOrder: Array<string> = [
+        // It is important that GRASS is first, then trail (background)!
+        ImageType.GRASS,
+        ImageType.TRAIL,
+        ImageType.STONE,
+        ImageType.BIRD1,
+        ImageType.BIRD2,
+        ImageType.APPLE,
+        ImageType.BANANA
+    ]
+    private _typeToPathData: Record<ImageType, string> = {
+        [ImageType.TRAIL]: "./img/trail.png",
+        [ImageType.GRASS]: "./img/grass.png",
+        [ImageType.STONE]: "./img/stone.png",
+        [ImageType.BIRD1]: "./img/bird-1.png",
+        [ImageType.BIRD2]: "./img/bird-2.png",
+        [ImageType.APPLE]: "./img/apple.png",
+        [ImageType.BANANA]: "./img/banana.png"
+    }
 
     constructor(metaData: MapMetaData) {
         this.createNewMap(metaData);
@@ -69,16 +89,7 @@ export class Map {
     }
 
     private imgToPath(type: ImageType): string {
-        const translation: Record<ImageType, string> = {
-            [ImageType.TRAIL]: "./img/trail.png",
-            [ImageType.GRASS]: "./img/grass.png",
-            [ImageType.STONE]: "./img/stone.png",
-            [ImageType.BIRD1]: "./img/bird-1.png",
-            [ImageType.BIRD2]: "./img/bird-2.png",
-            [ImageType.APPLE]: "./img/apple.png",
-            [ImageType.BANANA]: "./img/banana.png"
-        }
-        return translation[type];
+        return this._typeToPathData[type];
     }
 
     /*getCanvas(): HTMLCanvasElement {
@@ -123,6 +134,30 @@ export class Map {
                 img.src = this.imgToPath(field.image);
             }
         }
+    }
+
+    // This fast version does not work because the order of onload cannot be controlled...
+    private drawFast_DoesNotAlwaysWork(): void {
+        const content = this._content;
+        const m = this._meta.multiplier;
+
+        this._allImagesInOrder.forEach((image: ImageType) => {
+            const img = new Image();
+            img.src = this.imgToPath(image);
+            img.onload = () => {
+                for (let y = 0; y < content.length; y++) {
+                    for (let x = 0; x < content[y].length; x++) {
+                        // Drawing the image with coordinates pointing to top-left corner.
+                        const field = content[y][x];
+                        if (image == ImageType.GRASS ||
+                            (image == ImageType.TRAIL && field.isTrail) ||
+                            image == field.image) {
+                            this._ctx.drawImage(img, x * m, y * m, m, m);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     getStartingPoint(): Coord {
@@ -194,7 +229,6 @@ export class Map {
         const height = mapLength * multiplier;
         const width = mapWidth * multiplier;
         this._GAME_ELEMENTS.forEach(element => {
-            console.log(element);
             $(element).attr("height", height);
             $(element).attr("width", width);
         });
