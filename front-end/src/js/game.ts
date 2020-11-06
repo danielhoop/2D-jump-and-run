@@ -11,13 +11,13 @@ type Players = Record<string, unknown>;
 class Game {
     // Canvas viewport https://stackoverflow.com/questions/16919601/html5-canvas-camera-viewport-how-to-actually-do-it
 
-    private _FPS = 15;
+    private _FPS = 35;
     private _INTERVAL = 1000 / this._FPS; // milliseconds
     private _GAME_ELEMENTS = [
         "#map",
-        "#palyer1",
-        "#palyer2",
-        "#palyer3",
+        "#player1",
+        "#player2",
+        "#player3",
         "#velocity",
         "#gamepad"];
 
@@ -82,7 +82,7 @@ class Game {
     private setLevel1(): void {
         const meta: MapMetaData = {
             // Backup that works: mapLength: 40, mapWidth: 10, trailWidth: 2, multiplier: 40, dir: 1, stone: 0.1, animal: 0.05, food: 0.10
-            mapLength: 40, mapWidth: 10, trailWidth: 2, multiplier: 40, dir: 1, stone: 0.1, animal: 0.05, food: 0.10
+            mapLength: 100, mapWidth: 20, trailWidth: 3, multiplier: 40, dir: 1, stone: 0.1, animal: 0.05, food: 0.10
         };
         this.setMap(meta);
     }

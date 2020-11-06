@@ -114,7 +114,7 @@ export class Player {
                     this.decreaseVelocity();
                     this._hasJustCollided = true;
                 }
-                if (this._map.touchesFood(playerCoord)) {
+                if (this._velocity < this._MAX_VELOCITY && this._map.touchesFood(playerCoord)) {
                     this.increaseVelocity();
                 }
             }

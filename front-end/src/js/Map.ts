@@ -50,9 +50,9 @@ export class Map {
 
     private _GAME_ELEMENTS = [
         "#map",
-        "#palyer1",
-        "#palyer2",
-        "#palyer3",
+        "#player1",
+        "#player2",
+        "#player3",
         "#velocity",
         "#gamepad"];
     
@@ -88,6 +88,7 @@ export class Map {
     createNewMap(metaData: MapMetaData): void {
         this._meta = metaData;
         this._content = createMap(this._meta);
+        this.setCanvasDimensions();
     }
     getMapData(): MapData {
         return { content: this._content, meta: this._meta };
@@ -188,6 +189,16 @@ export class Map {
         return false;
     }
 
+    private setCanvasDimensions(): void {
+        const { mapLength, mapWidth, multiplier } = this._meta;
+        const height = mapLength * multiplier;
+        const width = mapWidth * multiplier;
+        this._GAME_ELEMENTS.forEach(element => {
+            console.log(element);
+            $(element).attr("height", height);
+            $(element).attr("width", width);
+        });
+    }
 }
 
 // mapLength: length of map
