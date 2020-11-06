@@ -105,7 +105,7 @@ $(document).ready(function () {
     const user: User = createUser("unknown");
 
     const game = new Game(
-        new Player(user.id, constants.PLAYER_1),
+        new Player(user.id, constants.PLAYER_1, true),
         {});
     game.start();
 

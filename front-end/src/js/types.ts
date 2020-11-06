@@ -36,7 +36,10 @@ export interface SocketData {
 }
 
 export interface PlayerPosition {
-    userId: string,
+    userId?: string,
     x: number,
-    y: number
+    y: number,
+    yJump?: number, // y at last jump
+    yColl?: number, // y at last collision
+    other?: boolean // Is it another player or myself?
 }

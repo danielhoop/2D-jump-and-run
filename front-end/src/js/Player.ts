@@ -5,6 +5,7 @@ import { constants, PlayerPosition } from "./types";
 
 export class Player {
 
+    private _isActor: boolean;
     private _userId: string;
     private _playerNo: number;
     private _yAtLastCollision = 99999;
@@ -27,7 +28,8 @@ export class Player {
     private _ctx: CanvasRenderingContext2D;
     private _veloCtx: CanvasRenderingContext2D;
 
-    constructor(userId: string, playerNo: number) {
+    constructor(userId: string, playerNo: number, isActor: boolean) {
+        this._isActor = isActor;
         this._userId = userId;
         this._playerNo = playerNo;
         this._imgPath = this.playerNoToImagePath();
@@ -49,12 +51,13 @@ export class Player {
         this._FPS = fps;
 
         this.updatePosition({
-            userId: this._userId,
             x: Math.floor(this._map.getMapData().meta.mapWidth / 2),
             y: this._map.getMapData().meta.mapLength - 2
         });
 
-        this.drawVelocity();
+        if (this._isActor) {
+            this.drawVelocity();
+        }
     }
 
     private playerNoToHtml(): string {
@@ -72,17 +75,25 @@ export class Player {
         }[this._playerNo.toString()];
     }
 
-    /*getCanvas(): HTMLCanvasElement {
-        return this._canvas;
-    }*/
-
+    // When the userId is not defined, then it is the own player (not another).
+    // In that case, handle collisions, velocity, etc.
     updatePosition(position: PlayerPosition): void {
-        if (position.userId == this._userId) {
+        if (position.other == undefined || !position.other || position.userId == this._userId) {
             if (position.x >= this._map.getMapData().meta.mapWidth || position.x < 0 || position.y < 0) {
                 return;
             }
             this._x = position.x;
             this._y = position.y;
+
+            // Do this only for received data.
+            if (position.other) {
+                if (position.yJump) {
+                    this._yAtLastJump = position.yJump
+                }
+                if (position.yColl) {
+                    this._yAtLastCollision
+                }
+            }
 
             // Reset collision and jumping information.
             this._isJumping = !(this._yAtLastJump - this._y > this._JUMP_DISTANCE);
@@ -106,6 +117,11 @@ export class Player {
             }
             img.src = this._imgPath;
 
+            // If it is not the actor, playing the game, then do not handle collsions and do not scroll.
+            if (position.other) {
+                return;
+            }
+
             // Handle collisions
             if (!this._isJumping) {
                 const playerCoord = { x: this._x, y: this._y };
@@ -124,7 +140,7 @@ export class Player {
             const documentHeight = $(document).height();
             const partOfPathTaken = 1 - (this._y / this._map.getMapData().meta.mapLength);
             const pixelsWalked = partOfPathTaken * documentHeight;
-            let scrollToHeight  = documentHeight;
+            let scrollToHeight = documentHeight;
             if (pixelsWalked > viewPortHeight / 2) {
                 scrollToHeight = documentHeight - pixelsWalked - viewPortHeight / 2;
             }
@@ -143,7 +159,7 @@ export class Player {
         this.drawVelocity();
     }
     private moveForward(): void {
-        const position: PlayerPosition = { userId: this._userId, x: this._x, y: this._y }
+        const position: PlayerPosition = { x: this._x, y: this._y }
         if (position.y <= 0) {
             // TODO send message to socket that tells that player is at end of course.
             return;
@@ -152,12 +168,12 @@ export class Player {
         this.updatePosition(position);
     }
     moveRight(): void {
-        const position: PlayerPosition = { userId: this._userId, x: this._x, y: this._y }
+        const position: PlayerPosition = { x: this._x, y: this._y }
         position.x = position.x + 1;
         this.updatePosition(position);
     }
     moveLeft(): void {
-        const position: PlayerPosition = { userId: this._userId, x: this._x, y: this._y }
+        const position: PlayerPosition = { x: this._x, y: this._y }
         position.x = position.x - 1;
         this.updatePosition(position);
     }
@@ -166,7 +182,7 @@ export class Player {
         if (!this._isJumping) {
             this._yAtLastJump = this._y;
             // To draw immediately another picture. Even though position has not changed.
-            this.updatePosition({ userId: this._userId, x: this._x, y: this._y });
+            this.updatePosition({ x: this._x, y: this._y });
         }
     }
 
