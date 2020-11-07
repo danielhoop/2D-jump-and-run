@@ -54,12 +54,17 @@ class Game {
     }
 
     start(): void {
-        setInterval(() => {
-            this.gameLoop(this)
-        }, this._INTERVAL);
-
         this._map.draw();
         dom.hideAllExcept(this._GAME_ELEMENTS);
+
+        // Wait some time until the map was drawn.
+        let gameInterv;
+        const setupInterv = setInterval(() => {
+            gameInterv = setInterval(() => {
+                this.gameLoop(this)
+            }, this._INTERVAL);
+            clearInterval(setupInterv);
+        }, this._map.msNeededForDrawing);
     }
 
     private gameLoop(thisObject: Game): void {

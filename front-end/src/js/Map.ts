@@ -62,7 +62,7 @@ export class Map {
     private _canvas: HTMLCanvasElement;
     private _ctx: CanvasRenderingContext2D;
 
-    private _allImagesInOrder: Array<string> = [
+    private _allImagesInOrder: Array<ImageType> = [
         // It is important that GRASS is first, then trail (background)!
         ImageType.GRASS,
         ImageType.TRAIL,
@@ -81,6 +81,10 @@ export class Map {
         [ImageType.APPLE]: "./img/apple.png",
         [ImageType.BANANA]: "./img/banana.png"
     }
+
+    private _msBetweenDrawing = 50;
+    private _nImgTypesToDraw = this._allImagesInOrder.length;
+    msNeededForDrawing = this._msBetweenDrawing * this._nImgTypesToDraw;
 
     constructor(metaData: MapMetaData) {
         this.createNewMap(metaData);
@@ -105,7 +109,42 @@ export class Map {
         return { content: this._content, meta: this._meta };
     }
 
+    // Works only because there is a 50ms break between the loading of each image.
+    // Else, the order of loading cannot be controlled and therefore applies might be drawn
+    // before grass, and therefore be overpainted by grass.
     draw(): void {
+        const content = this._content;
+        const m = this._meta.multiplier;
+
+        let i = 0;
+        const interv = setInterval(() => {
+            if (i == this._allImagesInOrder.length) {
+                clearInterval(interv);
+            } else {
+                const image: ImageType = this._allImagesInOrder[i];
+                const img = new Image();
+                img.src = this.imgToPath(image);
+                img.onload = () => {
+                    for (let y = 0; y < content.length; y++) {
+                        for (let x = 0; x < content[y].length; x++) {
+                            // Drawing the image with coordinates pointing to top-left corner.
+                            const field = content[y][x];
+                            if (image == ImageType.GRASS ||
+                                (image == ImageType.TRAIL && field.isTrail) ||
+                                image == field.image) {
+                                this._ctx.drawImage(img, x * m, y * m, m, m);
+                            }
+                        }
+                    }
+                }
+                i++;
+            }
+        }, this._msBetweenDrawing);
+        // this._allImagesInOrder.forEach((image: ImageType) => {});
+    }
+
+    /*
+    private draw_slowVersion(): void {
         const content = this._content;
         const m = this._meta.multiplier;
         for (let y = 0; y < content.length; y++) {
@@ -135,30 +174,7 @@ export class Map {
             }
         }
     }
-
-    // This fast version does not work because the order of onload cannot be controlled...
-    private drawFast_DoesNotAlwaysWork(): void {
-        const content = this._content;
-        const m = this._meta.multiplier;
-
-        this._allImagesInOrder.forEach((image: ImageType) => {
-            const img = new Image();
-            img.src = this.imgToPath(image);
-            img.onload = () => {
-                for (let y = 0; y < content.length; y++) {
-                    for (let x = 0; x < content[y].length; x++) {
-                        // Drawing the image with coordinates pointing to top-left corner.
-                        const field = content[y][x];
-                        if (image == ImageType.GRASS ||
-                            (image == ImageType.TRAIL && field.isTrail) ||
-                            image == field.image) {
-                            this._ctx.drawImage(img, x * m, y * m, m, m);
-                        }
-                    }
-                }
-            }
-        });
-    }
+    */
 
     getStartingPoint(): Coord {
         return {
