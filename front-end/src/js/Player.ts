@@ -1,11 +1,14 @@
 import $ from "jquery";
+import { GlobalState } from "./GlobalState";
 
 import { Map } from "./Map";
-import { constants, PlayerPosition } from "./types";
+import { constants, PlayerPosition, SocketData, SocketEvent } from "./types";
+import { User } from "./User";
 
 export class Player {
 
     private _isActor: boolean;
+    private _user: User;
     private _userId: string;
     private _playerNo: number;
     private _yAtLastCollision = 99999;
@@ -27,10 +30,12 @@ export class Player {
     private _canvas: HTMLCanvasElement;
     private _ctx: CanvasRenderingContext2D;
     private _veloCtx: CanvasRenderingContext2D;
+    private _socket: WebSocket;
 
-    constructor(userId: string, playerNo: number, isActor: boolean) {
+    constructor(user: User, playerNo: number, isActor: boolean) {
         this._isActor = isActor;
-        this._userId = userId;
+        this._userId = user.id;
+        this._user = user;
         this._playerNo = playerNo;
         this._imgPath = this.playerNoToImagePath();
 
@@ -44,6 +49,8 @@ export class Player {
         if (this._velocity > this._MAX_VELOCITY) {
             this._velocity = this._MAX_VELOCITY;
         }
+
+        this._socket = GlobalState.getInstance().getSocket();
     }
 
     initialize(map: Map, fps: number): void {
@@ -150,6 +157,28 @@ export class Player {
             console.log("partOfPathTaken: " + partOfPathTaken);
             console.log("pixelsWalked: " + pixelsWalked);
             console.log("scrollToHeight: " + scrollToHeight);*/
+
+
+            // Send data to other players.
+            const posMsg: PlayerPosition = {
+                userId: this._userId,
+                x: this._x,
+                y: this._y,
+                other: true
+            };
+            if (this._yAtLastJump == this._y) {
+                posMsg.yJump = this._yAtLastJump;
+            }
+            if (this._yAtLastCollision == this._y) {
+                posMsg.yColl = this._yAtLastCollision;
+            }
+
+            const socketMsg: SocketData = {
+                type: SocketEvent.PLAYER_POSITION_UPDATE,
+                roomId: this._user.roomId,
+                payload: posMsg
+            };
+            this._socket.send(JSON.stringify(socketMsg));
         }
     }
 

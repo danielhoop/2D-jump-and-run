@@ -15,6 +15,7 @@ import {
 } from "./types";
 import { MapMetaData } from "./Map";
 import { Player } from "./Player";
+import { GlobalState } from "./GlobalState";
 
 const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
     const name = $("#name-editor").val().toString();
@@ -104,10 +105,13 @@ $(document).ready(function () {
     // Create a user
     const user: User = createUser("unknown");
 
-    const game = new Game(
-        new Player(user.id, constants.PLAYER_1, true),
-        {});
-    game.start();
+    const socket = GlobalState.getInstance().getSocket();
+    socket.onopen = function () {
+        const game = new Game(
+            new Player(user, constants.PLAYER_1, true),
+            {});
+        game.start();
+    }
 
     /*
     // Open model to give username.

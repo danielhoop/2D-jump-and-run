@@ -41,5 +41,5 @@ export interface PlayerPosition {
     y: number,
     yJump?: number, // y at last jump
     yColl?: number, // y at last collision
-    other?: boolean // Is it another player or myself?
+    other?: boolean // Was the position sent by another player or by myself?
 }
