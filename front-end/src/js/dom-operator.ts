@@ -4,7 +4,13 @@ const allElementsOnPage: Array<string> = [
     "#title",
     "#group-container",
     "#name-modal",
-    "#game",
+    //".game-canvas",
+    "#map",
+    "#palyer1",
+    "#palyer2",
+    "#palyer3",
+    "#velocity",
+    "#gamepad",
     "#chat",
     "#chat-open-button"
 ]

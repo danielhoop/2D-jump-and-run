@@ -2,6 +2,7 @@ body, html {
     height: 100%;
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(50, 50, 50, 0.5);
   }
 
 footer {
@@ -57,6 +58,35 @@ footer {
     border-radius: 5px;
   }
 
+.game-canvas2 {
+    /*width: 1200px;*/
+    height: 70%;
+    /*visibility: hidden;*/
+    position: absolute;
+    top: 30px;
+    left: 30px;
+}
+
+/* https://stackoverflow.com/questions/982054/how-to-center-an-element-in-the-middle-of-the-browser-window */
+.game-canvas {
+    width: 30%;
+    position: absolute;
+    left: 50%;
+    margin-left: -15%;
+}
+
+#gamepad {
+    z-index: 1;
+}
+
+#game-frame {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    height: 30%;
+    overflow: auto;
+}
+
 #group-container {
     background: rgba(187, 187, 187, 0.5);
     position: absolute;
@@ -71,28 +101,33 @@ footer {
     visibility: hidden;
 }
 
-.room {
+.group {
     background: rgba(255, 255, 255, 0.5);
     border-radius: 3px;
-    margin-bottom: 10px;
+    padding: 1%;
 }
 
 .group-name {
     font-family: inherit;
     font-weight: bold;
-    padding: 1%;
+    padding-bottom: 1%;
 }
 
 .group-members {
     font-family: inherit;
-    padding: 1%;
+}
+
+.group-button {
+    /* button button-small button-assertive */
+    margin-top: 1%;
+    margin-bottom: 10px;
+}
+
+#group-id-0 {
+    margin-bottom: 10px;
 }
 
 #name-modal {
-    visibility: hidden;
-}
-
-#game {
     visibility: hidden;
 }
 
