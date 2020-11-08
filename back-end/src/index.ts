@@ -6,7 +6,8 @@ import {
     SocketData,
     constants,
     UserData,
-    GameStartData
+    GameStartData,
+    PlayerPosition
 } from "./types";
 import { createMap, mapLevelMetaData } from "./MapCreator";
 import { MapData } from "./MapTypes";
@@ -60,9 +61,9 @@ const sendToRecipients = function (txt: string, recipientIds: Array<string>): vo
     })
 }
 
-const sendToRoom = function (txt: string, roomId: string) {
+const sendToRoom = function (txt: string, roomId: string, exceptUserId: string = undefined) {
     rooms[roomId].userIds.forEach((userId) => {
-        if (userDataList[userId]) {
+        if (userDataList[userId] && userId != exceptUserId) {
             userDataList[userId].socket.send(txt);
         }
     })
@@ -87,8 +88,9 @@ const deleteUserFromRoom = function (userData: UserData, sendToAll: boolean): vo
         }
     }
     if (sendToAll) {
-        userData.roomId = undefined;
-        sendGoupOrRoomChangeToAll(userData);
+        const userData2: UserData = _.clone(userData);
+        userData2.roomId = undefined;
+        sendGoupOrRoomChangeInfo(userData2, sendToAll, undefined);
     }
 }
 
@@ -99,8 +101,9 @@ const deleteUserFromGroup = function (userData: UserData, sendToAll: boolean): v
         groups[groupId] = _.difference(groups[groupId], [userId]);
     }
     if (sendToAll) {
-        userData.groupId = undefined;
-        sendGoupOrRoomChangeToAll(userData);
+        const userData2: UserData = _.clone(userData);
+        userData2.groupId = undefined;
+        sendGoupOrRoomChangeInfo(userData2, sendToAll, undefined);
     }
 }
 
@@ -114,9 +117,7 @@ const moveUserToRoom = function (userData: UserData, sendToAll: boolean) {
         }
         rooms[roomId].userIds.push(userId);
     }
-    if (sendToAll) {
-        sendGoupOrRoomChangeToAll(userData);
-    }
+    sendGoupOrRoomChangeInfo(userData, sendToAll, undefined);
 }
 
 const moveUserToGroup = function (userData: UserData, sendToAll: boolean) {
@@ -134,17 +135,21 @@ const moveUserToGroup = function (userData: UserData, sendToAll: boolean) {
         }
         groups[groupId].push(userId);
     }
-    if (sendToAll) {
-        sendGoupOrRoomChangeToAll(userData);
-    }
+    sendGoupOrRoomChangeInfo(userData, sendToAll, undefined);
 }
 
-const sendGoupOrRoomChangeToAll = function (userData: UserData) {
+const sendGoupOrRoomChangeInfo = function (userData: UserData, sendToAll: boolean, sendToUserId: string = undefined) {
     const msg: SocketData = {
         type: SocketEvent.USER_CHANGES_GROUP,
         payload: userData
     }
-    sendBroadcast(JSON.stringify(msg));
+    if (sendToAll) {
+        sendBroadcast(JSON.stringify(msg));
+        return;
+    }
+    if (sendToUserId) {
+        sendToRecipients(JSON.stringify(msg), [sendToUserId]);
+    }
 }
 
 // Server / socket functionality
@@ -153,7 +158,7 @@ SERVER.on("connection", function (socket) {
     // Send the user his/her id, room & group.
     const userId = "1" + Math.floor(Math.random() * 1000000000000);
     const initialUserData: UserData = {
-        name: "unknown",
+        name: constants.INITIAL_USER_NAME,
         userId: userId,
         roomId: constants.LOBBY,
         groupId: constants.GROUP_0
@@ -173,6 +178,7 @@ SERVER.on("connection", function (socket) {
     };
 
     // Add the user to room and group list
+    // sendGoupOrRoomChangeInfo(initialUserData, false, userId)
     moveUserToRoom(initialUserData, false);
     moveUserToGroup(initialUserData, false);
 
@@ -197,20 +203,39 @@ SERVER.on("connection", function (socket) {
     // When it is a broadcast, forward to all registered sockets,
     // Otherwise forward only to the recipients.
     socket.on("message", function (dat) {
-        console.log("on message, userId: " + userId);
         const txt: string = dat.toString();
         const msgData: SocketData = JSON.parse(txt);
         const userFromList: UserDataAndSocket = userDataList[userId];
-        console.log(msgData);
+        // console.log("on message, userId: " + userId);
+        // console.log(msgData);
+
+        // Position data is always sent to a specific room.
+        // Don't send back to the sender to avoid network traffic.
+        if (msgData.type == SocketEvent.POSITION) {
+            const position = msgData.payload as PlayerPosition;
+            sendToRoom(txt, msgData.roomId, position.userId);
+            return;
+        }
 
         // This case is primarily to update the name of the user on the server side.
         // Happens, when user has chosen a username.
         if (msgData.type == SocketEvent.USER_DATA) {
             const uData: UserData = msgData.payload;
             if (userId == uData.userId) {
+                // Update name
                 userDataList[userId].user.name = uData.name;
+                // Move to groups
                 moveUserToRoom(uData, true);
                 moveUserToGroup(uData, true);
+                // Send information about other players in groups to the one client.
+                for (const key in groups) {
+                    const idsInGroups = groups[key];
+                    for (let i = 0; i < idsInGroups.length; i++) {
+                        if (userDataList[idsInGroups[i]].user.name != constants.INITIAL_USER_NAME) {
+                            sendGoupOrRoomChangeInfo(userDataList[idsInGroups[i]].user, false, userId);
+                        }
+                    }
+                }
             }
             return;
         }
@@ -242,7 +267,7 @@ SERVER.on("connection", function (socket) {
                 moveUserToRoom(uData, true);
             });
 
-            
+
             // Create array with all players
             const players: Array<UserData> = [];
             usersInGroup.forEach(id => {
