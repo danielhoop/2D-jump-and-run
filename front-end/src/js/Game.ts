@@ -1,17 +1,14 @@
 import dom from "./dom-operator";
 
-import {
-    Map,
-    MapMetaData
-} from "./Map";
-import { Player } from "./Player";
-
-type Players = Record<string, unknown>;
+import { Map } from "./Map";
+import { MapData } from "./MapTypes";
+import { Player, Players } from "./Player";
+import { PlayerPosition } from "./types";
 
 class Game {
     // Canvas viewport https://stackoverflow.com/questions/16919601/html5-canvas-camera-viewport-how-to-actually-do-it
 
-    private _FPS = 35;
+    private _FPS = 22;
     private _INTERVAL = 1000 / this._FPS; // milliseconds
     private _GAME_ELEMENTS = [
         "#map",
@@ -21,15 +18,14 @@ class Game {
         "#velocity",
         "#gamepad"];
 
+    private _gameLoopInterval;
     private _player: Player;
     private _players: Players;
     private _map: Map;
-    private _canvas: HTMLCanvasElement;
 
     constructor(player: Player, players: Players) {
         this._player = player;
         this._players = players;
-        this.setLevel1();
 
         //this._map.getCanvas().addEventListener("keydown", (event) => {
         document.getElementById("gamepad").addEventListener("klck", (event) => {
@@ -55,41 +51,47 @@ class Game {
 
     start(): void {
         this._map.draw();
+        this._player.initialize(this._map, this._FPS)
+        if (this._players) {
+            for (const key in this._players) {
+                this._players[key].initialize(this._map, this._FPS);
+            }
+        }
         dom.hideAllExcept(this._GAME_ELEMENTS);
 
-        // Wait some time until the map was drawn.
-        let gameInterv;
+        // Wait some time until the map was drawn, then start the game loop.
         const setupInterv = setInterval(() => {
-            gameInterv = setInterval(() => {
+            this._gameLoopInterval = setInterval(() => {
                 this.gameLoop(this)
             }, this._INTERVAL);
             clearInterval(setupInterv);
         }, this._map.msNeededForDrawing);
     }
 
+    stop(): void {
+        clearInterval(this._gameLoopInterval);
+    }
+
     private gameLoop(thisObject: Game): void {
         thisObject._player.gameLoop();
+        // No game loop for the other players. They have their own game loop
+        // and send data via server to this client.
     }
 
-    private setMap(meta: MapMetaData): void {
+    setMap(mapData: MapData): void {
         if (this._map == undefined) {
-            this._map = new Map(meta);
+            this._map = new Map(mapData);
         } else {
-            this._map.createNewMap(meta);
+            this._map.setMap(mapData);
         }
-        this._player.initialize(this._map, this._FPS)
-        /* TODO: Uncomment this, when other players work.
-        for (const key in this._players) {
-            this._players[key].initialize(this._map, this._FPS);
-        } */
     }
 
-    private setLevel1(): void {
-        const meta: MapMetaData = {
-            // Backup that works: mapLength: 40, mapWidth: 10, trailWidth: 2, multiplier: 40, dir: 1, stone: 0.1, animal: 0.05, food: 0.10
-            mapLength: 100, mapWidth: 20, trailWidth: 3, multiplier: 40, dir: 1, stone: 0.1, animal: 0.05, food: 0.10
-        };
-        this.setMap(meta);
+    updatePlayerPosition(position: PlayerPosition): void {
+        // If there is no such player, then it is myself playing and therefore no update is needed.
+        // Because it is only a server rebroadcast of what I already know.
+        if (this._players[position.userId]) {
+            this._players[position.userId].updatePosition(position);
+        }
     }
 }
 

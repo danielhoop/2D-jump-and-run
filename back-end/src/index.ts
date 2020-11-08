@@ -5,22 +5,39 @@ import {
     SocketEvent,
     SocketData,
     constants,
-    UserData
+    UserData,
+    GameStartData
 } from "./types";
+import { createMap, mapLevelMetaData } from "./MapCreator";
+import { MapData } from "./MapTypes";
 
 interface UserDataAndSocket {
     user: UserData,
     socket: any
 }
 
+interface RoomData {
+    userIds: Array<string>, // uid
+    level: number,
+    playersAtEndOfMap: Array<string>,
+    scores: Record<string, Array<number>> // For each uid, 1 array. For each map, 1 place in the array.
+}
+const createEmptyRoom = function (): RoomData {
+    return {
+        userIds: [],
+        level: 0,
+        playersAtEndOfMap: [],
+        scores: {}
+    }
+}
+
 // --- Attributes ---
 const PORT = 8000;
 const SERVER = new ws.Server({ port: PORT });
-const MAX_GROUP_SIZE = 3;
 
 const userDataList: Record<string, UserDataAndSocket> = {};
-const rooms: Record<string, Array<string>> = {
-    [constants.LOBBY]: []
+const rooms: Record<string, RoomData> = {
+    [constants.LOBBY]: createEmptyRoom()
 };
 const groups: Record<string, Array<string>> = {
     [constants.GROUP_0]: []
@@ -44,7 +61,7 @@ const sendToRecipients = function (txt: string, recipientIds: Array<string>): vo
 }
 
 const sendToRoom = function (txt: string, roomId: string) {
-    rooms[roomId].forEach((userId) => {
+    rooms[roomId].userIds.forEach((userId) => {
         if (userDataList[userId]) {
             userDataList[userId].socket.send(txt);
         }
@@ -64,8 +81,8 @@ const deleteUserFromRoom = function (userData: UserData, sendToAll: boolean): vo
     const { userId } = userData;
     const roomId = userDataList[userId].user.roomId;
     if (roomId && rooms[roomId]) {
-        rooms[roomId] = _.difference(rooms[roomId], [userId]);
-        if (rooms[roomId].length == 0 && roomId != constants.LOBBY) {
+        rooms[roomId].userIds = _.difference(rooms[roomId].userIds, [userId]);
+        if (rooms[roomId].userIds.length == 0 && roomId != constants.LOBBY) {
             delete rooms[roomId];
         }
     }
@@ -93,9 +110,9 @@ const moveUserToRoom = function (userData: UserData, sendToAll: boolean) {
     if (roomId) {
         userDataList[userId].user.roomId = roomId;
         if (!rooms[roomId]) {
-            rooms[roomId] = [];
+            rooms[roomId] = createEmptyRoom();
         }
-        rooms[roomId].push(userId);
+        rooms[roomId].userIds.push(userId);
     }
     if (sendToAll) {
         sendGoupOrRoomChangeToAll(userData);
@@ -105,7 +122,7 @@ const moveUserToRoom = function (userData: UserData, sendToAll: boolean) {
 const moveUserToGroup = function (userData: UserData, sendToAll: boolean) {
     const { userId, groupId } = userData;
     // If the group is already full, then do not move the player to that group.
-    if (groupId && groupId != constants.GROUP_0 && groups[groupId] && groups[groupId].length == MAX_GROUP_SIZE) {
+    if (groupId && groupId != constants.GROUP_0 && groups[groupId] && groups[groupId].length == constants.MAX_ROOM_SIZE) {
         return;
     }
     // If groupId is null, then the user will be gone from all groups.
@@ -122,7 +139,7 @@ const moveUserToGroup = function (userData: UserData, sendToAll: boolean) {
     }
 }
 
-const sendGoupOrRoomChangeToAll = function(userData: UserData) {
+const sendGoupOrRoomChangeToAll = function (userData: UserData) {
     const msg: SocketData = {
         type: SocketEvent.USER_CHANGES_GROUP,
         payload: userData
@@ -207,7 +224,7 @@ SERVER.on("connection", function (socket) {
 
 
         // Take all members of a group and put them into a new room.
-        if (msgData.type == SocketEvent.START_GAME) {
+        if (msgData.type == SocketEvent.START_GAME_SERVER) {
             const uData: UserData = msgData.payload;
             if (uData.groupId == constants.GROUP_0 || userFromList.user.groupId == constants.GROUP_0) {
                 return;
@@ -225,16 +242,36 @@ SERVER.on("connection", function (socket) {
                 moveUserToRoom(uData, true);
             });
 
-            console.log("Rooms and groups:");
-            console.log(rooms);
-            console.log(groups);
+            
+            // Create array with all players
+            const players: Array<UserData> = [];
+            usersInGroup.forEach(id => {
+                players.push(userDataList[id].user);
+            });
+
+            // Create map for first level and send players/map to the players.
+            const gameStartPayload: GameStartData = {
+                players: players,
+                mapData: {
+                    meta: mapLevelMetaData[0],
+                    content: createMap(mapLevelMetaData[0])
+                }
+            }
+            const mapToSend: SocketData = {
+                type: SocketEvent.START_GAME_CLIENT,
+                payload: gameStartPayload
+            }
+            sendToRoom(JSON.stringify(mapToSend), newRoomId);
+            return;
         }
 
+        /*
         console.log("Below is the list of sockets, list of rooms, list of groups.");
-        //console.log(userDataList);
+        console.log(userDataList);
         console.log(rooms);
         console.log(groups);
         console.log("---");
+        */
 
         if (msgData.broadcast) {
             sendBroadcast(txt);

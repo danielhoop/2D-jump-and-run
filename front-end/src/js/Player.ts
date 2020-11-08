@@ -2,10 +2,17 @@ import $ from "jquery";
 import { GlobalState } from "./GlobalState";
 
 import { Map } from "./Map";
-import { constants, PlayerPosition, SocketData, SocketEvent } from "./types";
+import { PlayerPosition, SocketData, SocketEvent, UserData } from "./types";
 import { User } from "./User";
 
+export type Players = Record<string, Player>;
+
 export class Player {
+
+    static PLAYER_1 = 1;
+    static PLAYER_2 = 2;
+    static PLAYER_3 = 3;
+    static OTHER_POTENTIAL_PLAYERS = [2, 3];
 
     private _isActor: boolean;
     private _user: User;
@@ -53,6 +60,19 @@ export class Player {
         this._socket = GlobalState.getInstance().getSocket();
     }
 
+    static createOtherPlayers(players: Array<UserData>): Players {
+        if (players && players.length > 0) {
+            const otherPlayers: Players = {};
+            for (let i = 0; i < Player.OTHER_POTENTIAL_PLAYERS.length && i < players.length; i++) {
+                const o = players[i];
+                const playerNo = Player.OTHER_POTENTIAL_PLAYERS[i];
+                otherPlayers[o.userId] = new Player({ id: o.userId, name: o.name, groupId: o.groupId, roomId: o.roomId }, playerNo, false);
+            }
+            return otherPlayers;
+        }
+        return undefined;
+    }
+
     initialize(map: Map, fps: number): void {
         this._map = map;
         this._FPS = fps;
@@ -69,16 +89,16 @@ export class Player {
 
     private playerNoToHtml(): string {
         return {
-            [constants.PLAYER_1]: "player1",
-            [constants.PLAYER_2]: "player2",
-            [constants.PLAYER_3]: "player3"
+            [Player.PLAYER_1]: "player1",
+            [Player.PLAYER_2]: "player2",
+            [Player.PLAYER_3]: "player3"
         }[this._playerNo.toString()];
     }
     private playerNoToImagePath(): string {
         return {
-            [constants.PLAYER_1]: "./img/hiker-colored.png",
-            [constants.PLAYER_2]: "./img/hiker.png",
-            [constants.PLAYER_3]: "./img/hiker.png"
+            [Player.PLAYER_1]: "./img/hiker-colored.png",
+            [Player.PLAYER_2]: "./img/hiker.png",
+            [Player.PLAYER_3]: "./img/hiker.png"
         }[this._playerNo.toString()];
     }
 
@@ -174,7 +194,7 @@ export class Player {
             }
 
             const socketMsg: SocketData = {
-                type: SocketEvent.PLAYER_POSITION_UPDATE,
+                type: SocketEvent.POSITION,
                 roomId: this._user.roomId,
                 payload: posMsg
             };

@@ -11,10 +11,11 @@ import {
     SocketData,
     SocketEvent,
     UserData,
-    constants
+    constants,
+    GameStartData,
+    PlayerPosition,
 } from "./types";
-import { MapMetaData } from "./Map";
-import { Player } from "./Player";
+import { Player, Players } from "./Player";
 import { GlobalState } from "./GlobalState";
 
 const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
@@ -70,7 +71,7 @@ const startGame = function (user: User, groupId: string, socket: WebSocket) {
         groupId: user.groupId
     }
     const msg: SocketData = {
-        type: SocketEvent.START_GAME,
+        type: SocketEvent.START_GAME_SERVER,
         roomId: user.roomId,
         payload: userData
     }
@@ -92,6 +93,7 @@ const moveUserToGroup = function (user: User, groupId: string, socket: WebSocket
     }
     socket.send(JSON.stringify(msg));
 }
+let game: Game = undefined;
 
 $(document).ready(function () {
 
@@ -152,10 +154,13 @@ $(document).ready(function () {
             // On message...
             socket.onmessage = function (e) {
                 const data: SocketData = JSON.parse(e.data);
-                console.log("Received message:");
-                console.log(data);
+                // console.log("Received message:"); console.log(data);
 
-                if (data.type == SocketEvent.USER_DATA) {
+                if (data.type == SocketEvent.POSITION) {
+                    const playerPosition = data.payload as PlayerPosition;
+                    game.updatePlayerPosition(playerPosition);
+
+                } else if (data.type == SocketEvent.USER_DATA) {
                     // If the user has no id, then it must be initialized.
                     const payload: UserData = data.payload;
 
@@ -182,14 +187,20 @@ $(document).ready(function () {
                             '<div class="group-member" id="group-member-id-' + payload.userId + '">' + payload.name + '</div>');
                     }
 
-                } else if (data.type == SocketEvent.START_GAME) {
-                    const game = new Game(
-                        new Player(user, constants.PLAYER_1, true),
-                        {});
+                } else if (data.type == SocketEvent.START_GAME_CLIENT) {
+                    const payload = data.payload as GameStartData;
+                    const otherPlayers = payload.players;
+                    for (let i = 0; i < otherPlayers.length; i++) {
+                        if (otherPlayers[i].userId == user.id) {
+                            otherPlayers.splice(i, 1);
+                        }
+                    }
+                    game = new Game(
+                        new Player(user, Player.PLAYER_1, true),
+                        Player.createOtherPlayers(otherPlayers));
+                    game.setMap(payload.mapData);
                     game.start();
                 }
-
-                // console.log("User:"); console.log(user);
             }
 
             // Changing the group
