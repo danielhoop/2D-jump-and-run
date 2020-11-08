@@ -9,8 +9,8 @@ export interface User {
 
 export const createUser = function(name: string): User {
   return {
-    name: name,
-    id: "id-is-created-by-server",
+    name: "unknown",
+    id: undefined,
     roomId: constants.LOBBY,
     groupId: constants.GROUP_0
   }

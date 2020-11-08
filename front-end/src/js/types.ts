@@ -1,4 +1,7 @@
+import { MapData } from "./MapTypes";
+
 export const constants = {
+    INITIAL_USER_NAME: "xeox7xmknUQlMWB8D0IR",
     LOBBY: "LOBBY",
     GROUP_0: "group-id-0",
     GROUP_1: "group-id-1",
@@ -7,17 +10,16 @@ export const constants = {
     BUTTON_GROUP_1: "button-group-id-1",
     BUTTON_GROUP_2: "button-group-id-2",
     BUTTON_GROUP_3: "button-group-id-3",
-    PLAYER_1: 1,
-    PLAYER_2: 2,
-    PLAYER_3: 3
+    MAX_ROOM_SIZE: 3
 }
 
 export enum SocketEvent {
     CHAT_MESSAGE = "CHAT_MESSAGE",
     USER_DATA = "USER_DATA",
     USER_CHANGES_GROUP = "USER_CHANGES_GROUP",
-    START_GAME = "START_GAME",
-    PLAYER_POSITION_UPDATE = "PLAYER_POSITION_UPDATE"
+    START_GAME_CLIENT = "START_GAME_CLIENT",
+    START_GAME_SERVER = "START_GAME_SERVER",
+    POSITION = "POSITION"
 }
 
 export interface UserData {
@@ -36,7 +38,15 @@ export interface SocketData {
 }
 
 export interface PlayerPosition {
-    userId: string,
+    userId?: string,
     x: number,
-    y: number
+    y: number,
+    yJump?: number, // y at last jump
+    yColl?: number, // y at last collision
+    other?: boolean // Was the position sent by another player or by myself?
+}
+
+export interface GameStartData {
+    players: Array<UserData>,
+    mapData: MapData
 }

@@ -1,10 +1,21 @@
 import $ from "jquery";
+import { GlobalState } from "./GlobalState";
 
 import { Map } from "./Map";
-import { constants, PlayerPosition } from "./types";
+import { PlayerPosition, SocketData, SocketEvent, UserData } from "./types";
+import { User } from "./User";
+
+export type Players = Record<string, Player>;
 
 export class Player {
 
+    static PLAYER_1 = 1;
+    static PLAYER_2 = 2;
+    static PLAYER_3 = 3;
+    static OTHER_POTENTIAL_PLAYERS = [2, 3];
+
+    private _isActor: boolean;
+    private _user: User;
     private _userId: string;
     private _playerNo: number;
     private _yAtLastCollision = 99999;
@@ -26,9 +37,12 @@ export class Player {
     private _canvas: HTMLCanvasElement;
     private _ctx: CanvasRenderingContext2D;
     private _veloCtx: CanvasRenderingContext2D;
+    private _socket: WebSocket;
 
-    constructor(userId: string, playerNo: number) {
-        this._userId = userId;
+    constructor(user: User, playerNo: number, isActor: boolean) {
+        this._isActor = isActor;
+        this._userId = user.id;
+        this._user = user;
         this._playerNo = playerNo;
         this._imgPath = this.playerNoToImagePath();
 
@@ -42,6 +56,21 @@ export class Player {
         if (this._velocity > this._MAX_VELOCITY) {
             this._velocity = this._MAX_VELOCITY;
         }
+
+        this._socket = GlobalState.getInstance().getSocket();
+    }
+
+    static createOtherPlayers(players: Array<UserData>): Players {
+        if (players && players.length > 0) {
+            const otherPlayers: Players = {};
+            for (let i = 0; i < Player.OTHER_POTENTIAL_PLAYERS.length && i < players.length; i++) {
+                const o = players[i];
+                const playerNo = Player.OTHER_POTENTIAL_PLAYERS[i];
+                otherPlayers[o.userId] = new Player({ id: o.userId, name: o.name, groupId: o.groupId, roomId: o.roomId }, playerNo, false);
+            }
+            return otherPlayers;
+        }
+        return undefined;
     }
 
     initialize(map: Map, fps: number): void {
@@ -49,40 +78,49 @@ export class Player {
         this._FPS = fps;
 
         this.updatePosition({
-            userId: this._userId,
             x: Math.floor(this._map.getMapData().meta.mapWidth / 2),
             y: this._map.getMapData().meta.mapLength - 2
         });
 
-        this.drawVelocity();
+        if (this._isActor) {
+            this.drawVelocity();
+        }
     }
 
     private playerNoToHtml(): string {
         return {
-            [constants.PLAYER_1]: "player1",
-            [constants.PLAYER_2]: "player2",
-            [constants.PLAYER_3]: "player3"
+            [Player.PLAYER_1]: "player1",
+            [Player.PLAYER_2]: "player2",
+            [Player.PLAYER_3]: "player3"
         }[this._playerNo.toString()];
     }
     private playerNoToImagePath(): string {
         return {
-            [constants.PLAYER_1]: "./img/hiker-colored.png",
-            [constants.PLAYER_2]: "./img/hiker.png",
-            [constants.PLAYER_3]: "./img/hiker.png"
+            [Player.PLAYER_1]: "./img/hiker-colored.png",
+            [Player.PLAYER_2]: "./img/hiker.png",
+            [Player.PLAYER_3]: "./img/hiker.png"
         }[this._playerNo.toString()];
     }
 
-    /*getCanvas(): HTMLCanvasElement {
-        return this._canvas;
-    }*/
-
+    // When the userId is not defined, then it is the own player (not another).
+    // In that case, handle collisions, velocity, etc.
     updatePosition(position: PlayerPosition): void {
-        if (position.userId == this._userId) {
+        if (position.other == undefined || !position.other || position.userId == this._userId) {
             if (position.x >= this._map.getMapData().meta.mapWidth || position.x < 0 || position.y < 0) {
                 return;
             }
             this._x = position.x;
             this._y = position.y;
+
+            // Do this only for received data.
+            if (position.other) {
+                if (position.yJump) {
+                    this._yAtLastJump = position.yJump
+                }
+                if (position.yColl) {
+                    this._yAtLastCollision
+                }
+            }
 
             // Reset collision and jumping information.
             this._isJumping = !(this._yAtLastJump - this._y > this._JUMP_DISTANCE);
@@ -106,6 +144,11 @@ export class Player {
             }
             img.src = this._imgPath;
 
+            // If it is not the actor, playing the game, then do not handle collsions and do not scroll.
+            if (position.other) {
+                return;
+            }
+
             // Handle collisions
             if (!this._isJumping) {
                 const playerCoord = { x: this._x, y: this._y };
@@ -124,7 +167,7 @@ export class Player {
             const documentHeight = $(document).height();
             const partOfPathTaken = 1 - (this._y / this._map.getMapData().meta.mapLength);
             const pixelsWalked = partOfPathTaken * documentHeight;
-            let scrollToHeight  = documentHeight;
+            let scrollToHeight = documentHeight;
             if (pixelsWalked > viewPortHeight / 2) {
                 scrollToHeight = documentHeight - pixelsWalked - viewPortHeight / 2;
             }
@@ -134,6 +177,28 @@ export class Player {
             console.log("partOfPathTaken: " + partOfPathTaken);
             console.log("pixelsWalked: " + pixelsWalked);
             console.log("scrollToHeight: " + scrollToHeight);*/
+
+
+            // Send data to other players.
+            const posMsg: PlayerPosition = {
+                userId: this._userId,
+                x: this._x,
+                y: this._y,
+                other: true
+            };
+            if (this._yAtLastJump == this._y) {
+                posMsg.yJump = this._yAtLastJump;
+            }
+            if (this._yAtLastCollision == this._y) {
+                posMsg.yColl = this._yAtLastCollision;
+            }
+
+            const socketMsg: SocketData = {
+                type: SocketEvent.POSITION,
+                roomId: this._user.roomId,
+                payload: posMsg
+            };
+            this._socket.send(JSON.stringify(socketMsg));
         }
     }
 
@@ -143,7 +208,7 @@ export class Player {
         this.drawVelocity();
     }
     private moveForward(): void {
-        const position: PlayerPosition = { userId: this._userId, x: this._x, y: this._y }
+        const position: PlayerPosition = { x: this._x, y: this._y }
         if (position.y <= 0) {
             // TODO send message to socket that tells that player is at end of course.
             return;
@@ -152,12 +217,12 @@ export class Player {
         this.updatePosition(position);
     }
     moveRight(): void {
-        const position: PlayerPosition = { userId: this._userId, x: this._x, y: this._y }
+        const position: PlayerPosition = { x: this._x, y: this._y }
         position.x = position.x + 1;
         this.updatePosition(position);
     }
     moveLeft(): void {
-        const position: PlayerPosition = { userId: this._userId, x: this._x, y: this._y }
+        const position: PlayerPosition = { x: this._x, y: this._y }
         position.x = position.x - 1;
         this.updatePosition(position);
     }
@@ -166,7 +231,7 @@ export class Player {
         if (!this._isJumping) {
             this._yAtLastJump = this._y;
             // To draw immediately another picture. Even though position has not changed.
-            this.updatePosition({ userId: this._userId, x: this._x, y: this._y });
+            this.updatePosition({ x: this._x, y: this._y });
         }
     }
 
