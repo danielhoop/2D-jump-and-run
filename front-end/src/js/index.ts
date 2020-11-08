@@ -164,9 +164,6 @@ $(document).ready(function () {
                             user.name = payload.name;
                         }
                         user.id = payload.userId;
-                    } else if (user.id == payload.userId) {
-                        user.roomId = payload.roomId;
-                        user.groupId = payload.groupId;
                     }
 
                 } else if (data.type == SocketEvent.CHAT_MESSAGE) {
@@ -176,6 +173,7 @@ $(document).ready(function () {
                     const payload: UserData = data.payload;
                     if (payload.userId == user.id) {
                         user.groupId = payload.groupId;
+                        user.roomId = payload.roomId;
                     }
                     $("#group-member-id-" + payload.userId).remove();
                     // If no groupId was given, then just remove from group completely.

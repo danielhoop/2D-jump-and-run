@@ -60,40 +60,56 @@ const sendToRoom = function (txt: string, roomId: string) {
     socket.send(JSON.stringify(msg));
 }*/
 
-const deleteUserFromRoom = function (userId: string, roomId: string): void {
+const deleteUserFromRoom = function (userData: UserData, sendToAll: boolean): void {
+    const { userId } = userData;
+    const roomId = userDataList[userId].user.roomId;
     if (roomId && rooms[roomId]) {
         rooms[roomId] = _.difference(rooms[roomId], [userId]);
         if (rooms[roomId].length == 0 && roomId != constants.LOBBY) {
             delete rooms[roomId];
         }
     }
-}
-
-const deleteUserFromGroup = function (userId: string, groupId: string): void {
-    if (groupId && groups[groupId]) {
-        groups[groupId] = _.difference(groups[groupId], [userId]);
+    if (sendToAll) {
+        userData.roomId = undefined;
+        sendGoupOrRoomChangeToAll(userData);
     }
 }
 
-// If roomId is null, then nothing will happen! It is always necessary to stay in a room.
-const moveUserToRoom = function (userId: string, roomId: string) {
+const deleteUserFromGroup = function (userData: UserData, sendToAll: boolean): void {
+    const { userId } = userData;
+    const groupId = userDataList[userId].user.groupId;
+    if (groupId && groups[groupId]) {
+        groups[groupId] = _.difference(groups[groupId], [userId]);
+    }
+    if (sendToAll) {
+        userData.groupId = undefined;
+        sendGoupOrRoomChangeToAll(userData);
+    }
+}
+
+const moveUserToRoom = function (userData: UserData, sendToAll: boolean) {
+    const { userId, roomId } = userData;
+    deleteUserFromRoom(userData, false); // Do not broadcast.
     if (roomId) {
-        deleteUserFromRoom(userId, userDataList[userId].user.roomId);
         userDataList[userId].user.roomId = roomId;
         if (!rooms[roomId]) {
             rooms[roomId] = [];
         }
         rooms[roomId].push(userId);
     }
+    if (sendToAll) {
+        sendGoupOrRoomChangeToAll(userData);
+    }
 }
 
-const moveUserToGroup = function (userId: string, groupId: string): boolean {
+const moveUserToGroup = function (userData: UserData, sendToAll: boolean) {
+    const { userId, groupId } = userData;
     // If the group is already full, then do not move the player to that group.
     if (groupId && groupId != constants.GROUP_0 && groups[groupId] && groups[groupId].length == MAX_GROUP_SIZE) {
-        return false;
+        return;
     }
     // If groupId is null, then the user will be gone from all groups.
-    deleteUserFromGroup(userId, userDataList[userId].user.groupId);
+    deleteUserFromGroup(userData, false); // Do not broadcast.
     if (groupId) {
         userDataList[userId].user.groupId = groupId;
         if (!groups[groupId]) {
@@ -101,7 +117,17 @@ const moveUserToGroup = function (userId: string, groupId: string): boolean {
         }
         groups[groupId].push(userId);
     }
-    return true;
+    if (sendToAll) {
+        sendGoupOrRoomChangeToAll(userData);
+    }
+}
+
+const sendGoupOrRoomChangeToAll = function(userData: UserData) {
+    const msg: SocketData = {
+        type: SocketEvent.USER_CHANGES_GROUP,
+        payload: userData
+    }
+    sendBroadcast(JSON.stringify(msg));
 }
 
 // Server / socket functionality
@@ -130,15 +156,15 @@ SERVER.on("connection", function (socket) {
     };
 
     // Add the user to room and group list
-    moveUserToRoom(userId, initialUserData.roomId);
-    moveUserToGroup(userId, initialUserData.groupId);
+    moveUserToRoom(initialUserData, false);
+    moveUserToGroup(initialUserData, false);
 
     // On socket close, remove user data from all lists.
     socket.on("close", function () {
         // Delete from room
-        deleteUserFromRoom(userId, userDataList[userId].user.roomId);
+        deleteUserFromRoom(initialUserData, true);
         // Delete from group. The group itself is not deleted (unlike the rooms).
-        deleteUserFromGroup(userId, userDataList[userId].user.groupId);
+        deleteUserFromGroup(initialUserData, true);
         // Delete from list with user data.
         delete userDataList[initialUserData.userId];
 
@@ -166,32 +192,17 @@ SERVER.on("connection", function (socket) {
             const uData: UserData = msgData.payload;
             if (userId == uData.userId) {
                 userDataList[userId].user.name = uData.name;
-                moveUserToRoom(userId, uData.roomId);
-                moveUserToGroup(userId, uData.groupId);
-
-                // Sync information of users in groups/rooms between all clients.
-                const userData: UserData = {
-                    name: uData.name,
-                    userId: uData.userId,
-                    roomId: uData.roomId,
-                    groupId: uData.groupId
-                }
-                const groupUpdateMsg: SocketData = {
-                    type: SocketEvent.USER_CHANGES_GROUP,
-                    roomId: uData.roomId,
-                    payload: userData
-                }
-                sendToRoom(JSON.stringify(groupUpdateMsg), msgData.roomId);
+                moveUserToRoom(uData, true);
+                moveUserToGroup(uData, true);
             }
+            return;
         }
 
         // Here, a user tells all other users that he/she changes groups.
         if (msgData.type == SocketEvent.USER_CHANGES_GROUP) {
             const uData: UserData = msgData.payload;
-            const canUserChange = moveUserToGroup(userId, uData.groupId);
-            if (!canUserChange) {
-                return;
-            }
+            moveUserToGroup(uData, true);
+            return;
         }
 
 
@@ -204,8 +215,14 @@ SERVER.on("connection", function (socket) {
             const newRoomId: string = "2" + Math.floor(Math.random() * 1000000000000);
             const usersInGroup: Array<string> = _.clone(groups[userDataList[userId].user.groupId])
             usersInGroup.forEach(userId => {
-                deleteUserFromGroup(userId, userDataList[userId].user.groupId);
-                moveUserToRoom(userId, newRoomId);
+                const uData: UserData = {
+                    userId: userId,
+                    name: userDataList[userId].user.name,
+                    groupId: undefined,
+                    roomId: newRoomId
+                }
+                deleteUserFromGroup(uData, false);
+                moveUserToRoom(uData, true);
             });
 
             console.log("Rooms and groups:");
