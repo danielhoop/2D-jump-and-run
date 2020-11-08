@@ -105,15 +105,6 @@ $(document).ready(function () {
     // Create a user
     const user: User = createUser("unknown");
 
-    const socket = GlobalState.getInstance().getSocket();
-    socket.onopen = function () {
-        const game = new Game(
-            new Player(user, constants.PLAYER_1, true),
-            {});
-        game.start();
-    }
-
-    /*
     // Open model to give username.
     dom.hideAllExcept(["#name-modal"]);
     $("#name-editor").focus();
@@ -122,7 +113,7 @@ $(document).ready(function () {
     if (window["WebSocket"]) {
 
         // Create socket
-        const socket = new WebSocket("ws://localhost:8000");
+        const socket = GlobalState.getInstance().getSocket();
 
         // On close
         socket.onclose = function () {
@@ -161,15 +152,22 @@ $(document).ready(function () {
             // On message...
             socket.onmessage = function (e) {
                 const data: SocketData = JSON.parse(e.data);
+                console.log("Received message:");
+                console.log(data);
 
                 if (data.type == SocketEvent.USER_DATA) {
+                    // If the user has no id, then it must be initialized.
                     const payload: UserData = data.payload;
-                    if (payload.name) {
-                        user.name = payload.name;
+
+                    if (!user.id) {
+                        if (payload.name) {
+                            user.name = payload.name;
+                        }
+                        user.id = payload.userId;
+                    } else if (user.id == payload.userId) {
+                        user.roomId = payload.roomId;
+                        user.groupId = payload.groupId;
                     }
-                    user.id = payload.userId;
-                    user.roomId = payload.roomId;
-                    user.groupId = payload.groupId;
 
                 } else if (data.type == SocketEvent.CHAT_MESSAGE) {
                     chat.receiveMsg(data.payload);
@@ -183,12 +181,17 @@ $(document).ready(function () {
                     // If no groupId was given, then just remove from group completely.
                     if (payload.groupId) {
                         $("#" + payload.groupId).children(".group-members").append(
-                            '<div class="group-member" id="group-member-id-' + user.id + '">' + user.name + '</div>');
+                            '<div class="group-member" id="group-member-id-' + payload.userId + '">' + payload.name + '</div>');
                     }
+
+                } else if (data.type == SocketEvent.START_GAME) {
+                    const game = new Game(
+                        new Player(user, constants.PLAYER_1, true),
+                        {});
+                    game.start();
                 }
 
-                console.log("User:");
-                console.log(user);
+                // console.log("User:"); console.log(user);
             }
 
             // Changing the group
@@ -220,5 +223,4 @@ $(document).ready(function () {
             })
         };
     }
-    */
 });
