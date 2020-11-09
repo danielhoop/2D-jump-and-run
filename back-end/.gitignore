@@ -2,3 +2,4 @@ node_modules
 
 src/config/secret.js
 build
+data.sqlite

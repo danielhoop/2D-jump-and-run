@@ -2,11 +2,11 @@ import { MapMetaData, MapContent, ImageType, Field, FieldType } from "./MapTypes
 
 export const mapLevelMetaData: Array<MapMetaData> = [
     // Settings for 5 levels.
-    { mapLength: 200, mapWidth: 20, trailWidth: 4, multiplier: 40, dir: 0.5, stone: 0.05, animal: 0.03, food: 0.12 },
-    { mapLength: 200, mapWidth: 20, trailWidth: 3, multiplier: 40, dir: 0.7, stone: 0.08, animal: 0.04, food: 0.10 },
-    { mapLength: 200, mapWidth: 20, trailWidth: 3, multiplier: 40, dir: 0.8, stone: 0.09, animal: 0.05, food: 0.08 },
-    { mapLength: 200, mapWidth: 20, trailWidth: 3, multiplier: 40, dir: 1.0, stone: 0.10, animal: 0.05, food: 0.06 },
-    { mapLength: 200, mapWidth: 20, trailWidth: 2, multiplier: 40, dir: 1.0, stone: 0.10, animal: 0.05, food: 0.05 },
+    { mapLength: 5, mapWidth: 20, trailWidth: 4, multiplier: 40, dir: 0.5, stone: 0.05, animal: 0.03, food: 0.12 },
+    { mapLength: 5, mapWidth: 20, trailWidth: 3, multiplier: 40, dir: 0.7, stone: 0.08, animal: 0.04, food: 0.10 },
+    { mapLength: 5, mapWidth: 20, trailWidth: 3, multiplier: 40, dir: 0.8, stone: 0.09, animal: 0.05, food: 0.08 },
+    { mapLength: 5, mapWidth: 20, trailWidth: 3, multiplier: 40, dir: 1.0, stone: 0.10, animal: 0.05, food: 0.06 },
+    { mapLength: 5, mapWidth: 20, trailWidth: 2, multiplier: 40, dir: 1.0, stone: 0.10, animal: 0.05, food: 0.05 },
 ]
 
 export const createMap = function (param: MapMetaData): MapContent {
