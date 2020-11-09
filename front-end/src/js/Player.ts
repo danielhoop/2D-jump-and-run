@@ -197,6 +197,7 @@ export class Player {
             if (this._y <= 0) {
                 this._reachedGoal = true;
                 posMsg.goal = true;
+                posMsg.userName = this._user.name;
             }
             if (this._yAtLastJump == this._y) {
                 posMsg.yJump = this._yAtLastJump;

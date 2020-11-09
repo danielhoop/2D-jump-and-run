@@ -175,7 +175,7 @@ $(document).ready(function () {
             // On message...
             socket.onmessage = function (e) {
                 const data: SocketData = JSON.parse(e.data);
-                console.log("Received message:"); console.log(data);
+                // console.log("Received message:"); console.log(data);
 
                 if (data.type == SocketEvent.POSITION) {
                     const playerPosition = data.payload as PlayerPosition;
@@ -274,15 +274,12 @@ $(document).ready(function () {
 
             // Start a game
             $("#" + constants.BUTTON_GROUP_1).on("click", function () {
-                console.log("fired: " + constants.GROUP_1);
                 startGame(user, constants.GROUP_1, socket);
             })
             $("#" + constants.BUTTON_GROUP_2).on("click", function () {
-                console.log("fired: " + constants.GROUP_2);
                 startGame(user, constants.GROUP_2, socket);
             })
             $("#" + constants.BUTTON_GROUP_3).on("click", function () {
-                console.log("fired: " + constants.GROUP_3);
                 startGame(user, constants.GROUP_3, socket);
             })
         };

@@ -1,6 +1,7 @@
 import * as ws from "ws";
 import * as _ from "lodash";
 
+
 import {
     SocketEvent,
     SocketData,
@@ -9,10 +10,13 @@ import {
     GameStartData,
     PlayerPosition,
     Scores,
-    Score
+    Score,
+    GameEvent
 } from "./types";
 import { createMap, mapLevelMetaData } from "./MapCreator";
 import { MapData } from "./MapTypes";
+import Database from "./Database";
+
 
 interface UserDataAndSocket {
     user: UserData,
@@ -38,7 +42,8 @@ const createEmptyRoom = function (): RoomData {
 
 // --- Attributes ---
 const PORT = 8000;
-const SERVER = new ws.Server({ port: PORT });
+const server = new ws.Server({ port: PORT });
+const db = new Database();
 
 const userDataList: Record<string, UserDataAndSocket> = {};
 const rooms: Record<string, RoomData> = {
@@ -72,15 +77,6 @@ const sendToRoom = function (txt: string, roomId: string, exceptUserId: string =
         }
     })
 }
-
-// Not type safe because TypeScript definition file for WebSocket is erroneous.
-/*const sendUserUpdateMsg = function (userData: UserData, socket: WebSocket) {
-    const msg: SocketData = {
-        type: SocketDataEnum.USER_DATA,
-        payload: userData
-    }
-    socket.send(JSON.stringify(msg));
-}*/
 
 const deleteUserFromRoom = function (userData: UserData, sendToAll: boolean): void {
     const { userId } = userData;
@@ -173,14 +169,20 @@ const switchToNextLevelOrStopGame = function (roomId: string) {
             })
         });
         // Sort scores in ascending order
-        scores = _.sortBy(scores, function(o: Score) { return o.totalTime; } ) ;
+        scores = _.sortBy(scores, function (o: Score) { return o.totalTime; });
 
-        // Send to players
+        // Send scores to players
         const scoresMsg: SocketData = {
             type: SocketEvent.END_GAME,
             payload: scores
         }
         sendToRoom(JSON.stringify(scoresMsg), roomId);
+
+        // Store scores in database.
+        scores.forEach(score => {
+            db.addScore(score.userId, score.name, score.totalTime, roomId);
+        });
+        
 
     } else {
 
@@ -198,12 +200,10 @@ const switchToNextLevelOrStopGame = function (roomId: string) {
         // Set starting time for level.
         room.startingTime = new Date().getTime();
     }
-
-    console.log(room);
 }
 
 // Server / socket functionality
-SERVER.on("connection", function (socket) {
+server.on("connection", function (socket) {
 
     // Send the user his/her id, room & group.
     const userId = "1" + Math.floor(Math.random() * 1000000000000);
@@ -241,12 +241,14 @@ SERVER.on("connection", function (socket) {
         // Delete from list with user data.
         delete userDataList[initialUserData.userId];
 
+        /*
         console.log("User: '" + userId + "' has left.");
         console.log("Below is the list of sockets, list of rooms, list of groups.");
         console.log(userDataList);
         console.log(rooms);
         console.log(groups);
         console.log("---");
+        */
     });
 
     // On message...
@@ -264,7 +266,17 @@ SERVER.on("connection", function (socket) {
         // Don't send back to the sender to avoid network traffic.
         if (msgData.type == SocketEvent.POSITION) {
             const position = msgData.payload as PlayerPosition;
+
+            if (position.yJump == position.y) {
+                db.addGameEvent(position.userId, GameEvent.JUMP, position.x, position.y, new Date().getTime());
+            }
+            if (position.yColl == position.y) {
+                db.addGameEvent(position.userId, GameEvent.COLLISION, position.x, position.y, new Date().getTime());
+            }
+
             if (position.goal) {
+                db.addGameEvent(position.userId, GameEvent.GOAL, position.x, position.y, new Date().getTime());
+
                 const room = rooms[msgData.roomId];
                 const timeNeeded = new Date().getTime() - room.startingTime;
 
@@ -323,6 +335,8 @@ SERVER.on("connection", function (socket) {
             const newRoomId: string = "2" + Math.floor(Math.random() * 1000000000000);
             const playersData: Array<UserData> = [];
             const userIdsInGroup: Array<string> = _.clone(groups[userDataList[userId].user.groupId])
+
+            db.addRoom(newRoomId, new Date().getTime());
 
             userIdsInGroup.forEach(userId => {
 

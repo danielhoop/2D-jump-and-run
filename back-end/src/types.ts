@@ -24,6 +24,12 @@ export enum SocketEvent {
     POSITION = "POSITION"
 }
 
+export enum GameEvent {
+    COLLISION = 0,
+    JUMP = 1,
+    GOAL = 2
+}
+
 export interface UserData {
     name: string,
     userId: string,
@@ -41,6 +47,7 @@ export interface SocketData {
 
 export interface PlayerPosition {
     userId?: string,
+    userName?: string,
     x: number,
     y: number,
     yJump?: number, // y at last jump
