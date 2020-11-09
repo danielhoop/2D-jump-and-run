@@ -130,6 +130,17 @@ footer {
 #name-modal {
     visibility: hidden;
 }
+#score-modal {
+    visibility: hidden;
+}
+#score-table {
+    text-align:center;
+}
+#score-name {
+    font-family: inherit;
+    font-weight: bold;
+}
+
 
 #chat-open-button {
     visibility: hidden;

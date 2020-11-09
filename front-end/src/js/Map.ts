@@ -130,18 +130,9 @@ export class Map {
 
     getStartingPoint(): Coord {
         return {
-            x: Math.floor(this._meta.mapWidth / 2),
+            x: this._meta.mapWidth / 2,
             y: this._meta.mapLength - 2
         };
-        /*const firstLine = this._content[0];
-        for (let i=0; i<firstLine.length; i++) {
-            if (firstLine[i].type === FieldType.TRAIL) {
-                return {
-                    x: i*this._meta.multiplier + this._meta.trailWidth,
-                    y: 0
-                }
-            }
-        }*/
     }
 
     private touchesSomething(coord: Coord, what: FieldType): Coord {

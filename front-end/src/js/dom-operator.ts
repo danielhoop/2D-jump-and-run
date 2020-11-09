@@ -6,13 +6,14 @@ const allElementsOnPage: Array<string> = [
     "#name-modal",
     //".game-canvas",
     "#map",
-    "#palyer1",
-    "#palyer2",
-    "#palyer3",
+    "#player1",
+    "#player2",
+    "#player3",
     "#velocity",
     "#gamepad",
     "#chat",
-    "#chat-open-button"
+    "#chat-open-button",
+    "#score-modal"
 ]
 
 const hideAllExcept = function(except: Array<string>): void {

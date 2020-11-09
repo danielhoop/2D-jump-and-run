@@ -14,23 +14,25 @@ export class Player {
     static PLAYER_3 = 3;
     static OTHER_POTENTIAL_PLAYERS = [2, 3];
 
-    private _isActor: boolean;
-    private _user: User;
-    private _userId: string;
-    private _playerNo: number;
-    private _yAtLastCollision = 99999;
-    private _yAtLastJump = 99999;
-    private _hasJustCollided = false;
-    private _isJumping = false;
-    private _x: number;
-    private _y: number;
-    private _FPS: number;
-    private _velocity: number;
     private _MIN_VELOCITY = 1;
     private _MAX_VELOCITY = 4;
     private _MAX_FIELDS_PER_SECOND = 4;
     private _JUMP_DISTANCE = 2.3;
     private _COLLISON_DISTANCE = 2.01;
+
+    private _isActor: boolean;
+    private _user: User;
+    private _userId: string;
+    private _playerNo: number;
+    private _yAtLastCollision: number;
+    private _yAtLastJump: number;
+    private _hasJustCollided = false;
+    private _isJumping = false;
+    private _x: number;
+    private _y: number;
+    private _reachedGoal = false;
+    private _velocity: number;
+    private _fps: number;
     private _map: Map;
     private _imgPath: string;
     private _veloImgPath = "./img/velo-points.png";
@@ -75,11 +77,15 @@ export class Player {
 
     initialize(map: Map, fps: number): void {
         this._map = map;
-        this._FPS = fps;
+        this._fps = fps;
+        this._reachedGoal = false;
+        this._yAtLastCollision = map.getMapData().meta.mapLength + 99;
+        this._yAtLastJump = map.getMapData().meta.mapLength + 99;
 
+        const startingPoint = this._map.getStartingPoint();
         this.updatePosition({
-            x: Math.floor(this._map.getMapData().meta.mapWidth / 2),
-            y: this._map.getMapData().meta.mapLength - 2
+            x: startingPoint.x,
+            y: startingPoint.y
         });
 
         if (this._isActor) {
@@ -106,7 +112,7 @@ export class Player {
     // In that case, handle collisions, velocity, etc.
     updatePosition(position: PlayerPosition): void {
         if (position.other == undefined || !position.other || position.userId == this._userId) {
-            if (position.x >= this._map.getMapData().meta.mapWidth || position.x < 0 || position.y < 0) {
+            if (this._reachedGoal || position.x >= this._map.getMapData().meta.mapWidth || position.x < 0) {
                 return;
             }
             this._x = position.x;
@@ -126,23 +132,25 @@ export class Player {
             this._isJumping = !(this._yAtLastJump - this._y > this._JUMP_DISTANCE);
             this._hasJustCollided = !(this._yAtLastCollision - this._y > this._COLLISON_DISTANCE);
 
-            // Draw the avatar
-            const m = this._map.getMapData().meta.multiplier;
-            const img = new Image();
-            img.onload = () => {
-                // Drawing the image with coordinates pointing to top-left corner.
-                this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-                if (this._isJumping) {
-                    // Shadow below figure. Figure is slightly larger than usually.
-                    this._ctx.fillStyle = "gray";
-                    this._ctx.fillRect(position.x * m - m * 0.40, position.y * m - m * 0.40, m * 1.60, m * 1.60);
-                    this._ctx.drawImage(img, position.x * m - m * 0.20, position.y * m - m * 0.20, m * 1.20, m * 1.20);
-                } else {
-                    // Normal sized figure.
-                    this._ctx.drawImage(img, position.x * m, position.y * m, m, m);
+            // Draw the avatar. But only if not passed through goal.
+            if (this._y >= 0) {
+                const m = this._map.getMapData().meta.multiplier;
+                const img = new Image();
+                img.onload = () => {
+                    // Drawing the image with coordinates pointing to top-left corner.
+                    this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+                    if (this._isJumping) {
+                        // Shadow below figure. Figure is slightly larger than usually.
+                        this._ctx.fillStyle = "gray";
+                        this._ctx.fillRect(position.x * m - m * 0.40, position.y * m - m * 0.40, m * 1.60, m * 1.60);
+                        this._ctx.drawImage(img, position.x * m - m * 0.20, position.y * m - m * 0.20, m * 1.20, m * 1.20);
+                    } else {
+                        // Normal sized figure.
+                        this._ctx.drawImage(img, position.x * m, position.y * m, m, m);
+                    }
                 }
+                img.src = this._imgPath;
             }
-            img.src = this._imgPath;
 
             // If it is not the actor, playing the game, then do not handle collsions and do not scroll.
             if (position.other) {
@@ -168,8 +176,8 @@ export class Player {
             const partOfPathTaken = 1 - (this._y / this._map.getMapData().meta.mapLength);
             const pixelsWalked = partOfPathTaken * documentHeight;
             let scrollToHeight = documentHeight;
-            if (pixelsWalked > viewPortHeight / 2) {
-                scrollToHeight = documentHeight - pixelsWalked - viewPortHeight / 2;
+            if (pixelsWalked > viewPortHeight * 0.34) {
+                scrollToHeight = documentHeight - pixelsWalked - viewPortHeight * 0.66;
             }
             window.scrollTo(0, scrollToHeight);
             /*console.log("documentHeight: " + documentHeight);
@@ -186,6 +194,10 @@ export class Player {
                 y: this._y,
                 other: true
             };
+            if (this._y <= 0) {
+                this._reachedGoal = true;
+                posMsg.goal = true;
+            }
             if (this._yAtLastJump == this._y) {
                 posMsg.yJump = this._yAtLastJump;
             }
@@ -209,11 +221,7 @@ export class Player {
     }
     private moveForward(): void {
         const position: PlayerPosition = { x: this._x, y: this._y }
-        if (position.y <= 0) {
-            // TODO send message to socket that tells that player is at end of course.
-            return;
-        }
-        position.y = position.y - (this._velocity / this._MAX_VELOCITY * this._MAX_FIELDS_PER_SECOND / this._FPS);
+        position.y = position.y - (this._velocity / this._MAX_VELOCITY * this._MAX_FIELDS_PER_SECOND / this._fps);
         this.updatePosition(position);
     }
     moveRight(): void {

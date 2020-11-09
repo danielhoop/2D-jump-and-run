@@ -16,9 +16,14 @@
     <!-- <div class="bg-image"></div>*/ -->
 
     <div id="name-modal" class="modal">
-        <div class="title">Please enter your nickname</div>
+        <div class="title-bold">Please enter your nickname</div>
         <input id="name-editor" type="text" value=""></input>
         <button id="name-enter-button" type="button">Proceed</button>
+    </div>
+
+    <div id="score-modal" class="modal">
+        <div id="score-title" class="title-bold">And the winner is...</div>
+        <table id="score-table"></table>
     </div>
 
 
@@ -63,10 +68,10 @@
     <!-- The ratio between height/width has to be the same as the ratio y/x of the game map. -->
     <canvas id="map" class="game-canvas" height="10" width="10">This is the game.</canvas>
     <canvas id="gamepad" class="game-canvas" height="10" width="10">This is the gamepad.</canvas>
+    <canvas id="player3" class="game-canvas" height="10" width="10">This is the player3.</canvas>
+    <canvas id="player2" class="game-canvas" height="10" width="10">This is the player2.</canvas>
     <canvas id="velocity" class="game-canvas" height="10" width="10">This is the game.</canvas>
     <canvas id="player1" class="game-canvas" height="10" width="10">This is the player1.</canvas>
-    <canvas id="player2" class="game-canvas" height="10" width="10">This is the player2.</canvas>
-    <canvas id="player3" class="game-canvas" height="10" width="10">This is the player3.</canvas>
 
     <div id="chat">
         <div id="chat-close-button"></div>
