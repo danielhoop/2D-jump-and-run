@@ -19,6 +19,8 @@ export enum SocketEvent {
     USER_CHANGES_GROUP = "USER_CHANGES_GROUP",
     START_GAME_CLIENT = "START_GAME_CLIENT",
     START_GAME_SERVER = "START_GAME_SERVER",
+    NEXT_LVL = "NEXT_LVL",
+    END_GAME = "END_GAME",
     POSITION = "POSITION"
 }
 
@@ -43,6 +45,7 @@ export interface PlayerPosition {
     y: number,
     yJump?: number, // y at last jump
     yColl?: number, // y at last collision
+    goal?: boolean, // Player has reached goal?
     other?: boolean // Was the position sent by another player or by myself?
 }
 
@@ -50,3 +53,6 @@ export interface GameStartData {
     players: Array<UserData>,
     mapData: MapData
 }
+
+export type Score = { userId: string, name: string, totalTime: number };
+export type Scores = Array<Score>;

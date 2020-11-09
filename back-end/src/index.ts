@@ -7,7 +7,9 @@ import {
     constants,
     UserData,
     GameStartData,
-    PlayerPosition
+    PlayerPosition,
+    Scores,
+    Score
 } from "./types";
 import { createMap, mapLevelMetaData } from "./MapCreator";
 import { MapData } from "./MapTypes";
@@ -21,6 +23,7 @@ interface RoomData {
     userIds: Array<string>, // uid
     level: number,
     playersAtEndOfMap: Array<string>,
+    startingTime: number,
     scores: Record<string, Array<number>> // For each uid, 1 array. For each map, 1 place in the array.
 }
 const createEmptyRoom = function (): RoomData {
@@ -28,6 +31,7 @@ const createEmptyRoom = function (): RoomData {
         userIds: [],
         level: 0,
         playersAtEndOfMap: [],
+        startingTime: 0,
         scores: {}
     }
 }
@@ -152,6 +156,52 @@ const sendGoupOrRoomChangeInfo = function (userData: UserData, sendToAll: boolea
     }
 }
 
+const switchToNextLevelOrStopGame = function (roomId: string) {
+
+    const room = rooms[roomId];
+    room.level++;
+
+    if (room.level >= mapLevelMetaData.length) {
+
+        // Calculate scores.
+        let scores: Scores = []
+        room.userIds.forEach(userId => {
+            scores.push({
+                userId: userId,
+                name: userDataList[userId].user.name,
+                totalTime: _.sum(room.scores[userId])
+            })
+        });
+        // Sort scores in ascending order
+        scores = _.sortBy(scores, function(o: Score) { return o.totalTime; } ) ;
+
+        // Send to players
+        const scoresMsg: SocketData = {
+            type: SocketEvent.END_GAME,
+            payload: scores
+        }
+        sendToRoom(JSON.stringify(scoresMsg), roomId);
+
+    } else {
+
+        // Create map for next level and send map to the players.
+        const payload: MapData = {
+            meta: mapLevelMetaData[room.level],
+            content: createMap(mapLevelMetaData[room.level])
+        }
+        const mapToSend: SocketData = {
+            type: SocketEvent.NEXT_LVL,
+            payload: payload
+        }
+        sendToRoom(JSON.stringify(mapToSend), roomId);
+
+        // Set starting time for level.
+        room.startingTime = new Date().getTime();
+    }
+
+    console.log(room);
+}
+
 // Server / socket functionality
 SERVER.on("connection", function (socket) {
 
@@ -209,13 +259,28 @@ SERVER.on("connection", function (socket) {
         // console.log("on message, userId: " + userId);
         // console.log(msgData);
 
+
         // Position data is always sent to a specific room.
         // Don't send back to the sender to avoid network traffic.
         if (msgData.type == SocketEvent.POSITION) {
             const position = msgData.payload as PlayerPosition;
+            if (position.goal) {
+                const room = rooms[msgData.roomId];
+                const timeNeeded = new Date().getTime() - room.startingTime;
+
+                room.playersAtEndOfMap.push(position.userId);
+                room.scores[position.userId].push(timeNeeded);
+
+                if (room.playersAtEndOfMap.length == room.userIds.length) {
+                    room.playersAtEndOfMap = [];
+                    switchToNextLevelOrStopGame(msgData.roomId);
+                    return;
+                }
+            }
             sendToRoom(txt, msgData.roomId, position.userId);
             return;
         }
+
 
         // This case is primarily to update the name of the user on the server side.
         // Happens, when user has chosen a username.
@@ -240,6 +305,7 @@ SERVER.on("connection", function (socket) {
             return;
         }
 
+
         // Here, a user tells all other users that he/she changes groups.
         if (msgData.type == SocketEvent.USER_CHANGES_GROUP) {
             const uData: UserData = msgData.payload;
@@ -255,8 +321,12 @@ SERVER.on("connection", function (socket) {
                 return;
             }
             const newRoomId: string = "2" + Math.floor(Math.random() * 1000000000000);
-            const usersInGroup: Array<string> = _.clone(groups[userDataList[userId].user.groupId])
-            usersInGroup.forEach(userId => {
+            const playersData: Array<UserData> = [];
+            const userIdsInGroup: Array<string> = _.clone(groups[userDataList[userId].user.groupId])
+
+            userIdsInGroup.forEach(userId => {
+
+                // Move players to groups
                 const uData: UserData = {
                     userId: userId,
                     name: userDataList[userId].user.name,
@@ -265,18 +335,17 @@ SERVER.on("connection", function (socket) {
                 }
                 deleteUserFromGroup(uData, false);
                 moveUserToRoom(uData, true);
-            });
 
+                // Create empty entry in scores.
+                rooms[newRoomId].scores[userId] = [];
 
-            // Create array with all players
-            const players: Array<UserData> = [];
-            usersInGroup.forEach(id => {
-                players.push(userDataList[id].user);
+                // Create array with player data (to send to clients)
+                playersData.push(userDataList[userId].user);
             });
 
             // Create map for first level and send players/map to the players.
             const gameStartPayload: GameStartData = {
-                players: players,
+                players: playersData,
                 mapData: {
                     meta: mapLevelMetaData[0],
                     content: createMap(mapLevelMetaData[0])
@@ -287,6 +356,9 @@ SERVER.on("connection", function (socket) {
                 payload: gameStartPayload
             }
             sendToRoom(JSON.stringify(mapToSend), newRoomId);
+
+            // Set starting time for level.
+            rooms[newRoomId].startingTime = new Date().getTime();
             return;
         }
 

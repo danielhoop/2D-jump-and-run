@@ -14,9 +14,12 @@ import {
     constants,
     GameStartData,
     PlayerPosition,
+    Scores,
 } from "./types";
 import { Player, Players } from "./Player";
 import { GlobalState } from "./GlobalState";
+import { MapData } from "./MapTypes";
+import domOperator from "./dom-operator";
 
 const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
     const name = $("#name-editor").val().toString();
@@ -93,6 +96,24 @@ const moveUserToGroup = function (user: User, groupId: string, socket: WebSocket
     }
     socket.send(JSON.stringify(msg));
 }
+
+const constLength = function (x: number, length: number, add = "0") {
+    let a = x + "";
+    while (a.length < length) {
+        a = add + a;
+    }
+    return a;
+}
+
+const msToMmSsMs = function (ms: number): string {
+    const mm = Math.floor(ms / 60000);
+    ms = ms % 60000;
+    const ss = Math.floor(ms / 1000);
+    ms = ms % 1000;
+
+    return constLength(mm, 2) + ":" + constLength(ss, 2) + "." + constLength(ms, 3);
+}
+
 let game: Game = undefined;
 
 $(document).ready(function () {
@@ -154,11 +175,16 @@ $(document).ready(function () {
             // On message...
             socket.onmessage = function (e) {
                 const data: SocketData = JSON.parse(e.data);
-                // console.log("Received message:"); console.log(data);
+                console.log("Received message:"); console.log(data);
 
                 if (data.type == SocketEvent.POSITION) {
                     const playerPosition = data.payload as PlayerPosition;
                     game.updatePlayerPosition(playerPosition);
+
+
+                } else if (data.type == SocketEvent.CHAT_MESSAGE) {
+                    chat.receiveMsg(data.payload);
+
 
                 } else if (data.type == SocketEvent.USER_DATA) {
                     // If the user has no id, then it must be initialized.
@@ -171,8 +197,6 @@ $(document).ready(function () {
                         user.id = payload.userId;
                     }
 
-                } else if (data.type == SocketEvent.CHAT_MESSAGE) {
-                    chat.receiveMsg(data.payload);
 
                 } else if (data.type == SocketEvent.USER_CHANGES_GROUP) {
                     const payload: UserData = data.payload;
@@ -187,6 +211,7 @@ $(document).ready(function () {
                             '<div class="group-member" id="group-member-id-' + payload.userId + '">' + payload.name + '</div>');
                     }
 
+
                 } else if (data.type == SocketEvent.START_GAME_CLIENT) {
                     const payload = data.payload as GameStartData;
                     const otherPlayers = payload.players;
@@ -200,7 +225,37 @@ $(document).ready(function () {
                         Player.createOtherPlayers(otherPlayers));
                     game.setMap(payload.mapData);
                     game.start();
+
+
+                } else if (data.type == SocketEvent.NEXT_LVL) {
+                    const mapData = data.payload as MapData;
+                    game.stop();
+                    game.setMap(mapData);
+                    game.start();
+
+
+                } else if (data.type == SocketEvent.END_GAME) {
+                    game.stop();
+
+                    const scores = data.payload as Scores;
+                    scores.forEach(score => {
+                        $("#score-table").append(
+                            `<tr class="score-row"><td class="score-name">${score.name}</td><td class="score-time">${msToMmSsMs(score.totalTime)}</td></tr>`
+                        );
+                        $("#scores").append(`<div class="score"><div>${score.name}</div><div>${msToMmSsMs(score.totalTime)}</div></div>`);
+                    });
+                    domOperator.hideAllExcept(["#score-modal"]);
+
+                    if (scores[0].userId == user.id) {
+                        new Audio("./sound/Congratulations.mp3").play();
+                        $("#scores-title").text("Congratulations! You have won the game!");
+                    } else {
+                        new Audio("./sound/MaybeNextTime.mp3").play();
+                        $("#scores-title").text("Maybe next time...");
+                    }
+
                 }
+
             }
 
             // Changing the group
