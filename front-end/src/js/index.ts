@@ -16,11 +16,51 @@ import {
     PlayerPosition,
     Scores,
 } from "./types";
-import { Player, Players } from "./Player";
+import { Player } from "./Player";
 import { GlobalState } from "./GlobalState";
 import { MapData } from "./MapTypes";
 import domOperator from "./dom-operator";
 
+
+// Orientation handling
+// https://stackoverflow.com/questions/1649086/detect-rotation-of-android-phone-in-the-browser-with-javascript
+let previousHeightWidth = $(window).width() + $(window).height();
+let previousOrientation = window.orientation;
+let orientationChangeInterval = null;
+
+const checkOrientation = function () {
+    const currentHeightWith = $(window).width() + $(window).height();
+    if (window.orientation !== previousOrientation || currentHeightWith != previousHeightWidth) {
+        previousOrientation = window.orientation;
+        previousHeightWidth = currentHeightWith;
+
+        // Determine which elements to show.
+        let elementsToShow = [];
+        if (dom.isSmartphoneLayout()) {
+            elementsToShow = ["#group-container", "#chat-open-button"];
+        } else {
+            elementsToShow = ["#chat", "#group-container"];
+        }
+        dom.hideAllExcept(elementsToShow);
+    }
+};
+
+const addOrientationChangeFunction = function () {
+    window.addEventListener("resize", checkOrientation, false);
+    window.addEventListener("orientationchange", checkOrientation, false);
+
+    // (optional) Android doesn't always fire orientationChange on 180 degree turns
+    orientationChangeInterval = setInterval(checkOrientation, 2000);
+}
+
+const removeOrientationChangeFunction = function () {
+    window.removeEventListener("resize", checkOrientation, false);
+    window.removeEventListener("orientationchange", checkOrientation, false);
+    clearInterval(orientationChangeInterval);
+}
+
+
+// Other functions
 const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
     const name = $("#name-editor").val().toString();
     if (name != "") {
@@ -30,7 +70,17 @@ const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
         $("#" + constants.GROUP_0).children(".group-members").append(
             '<div class="group-member" id="group-member-id-' + user.id + '">' + name + '</div>');
 
-        dom.hideAllExcept(["#chat", "#group-container"]);
+        // Determine which elements to show.
+        let elementsToShow = [];
+        if (dom.isSmartphoneLayout()) {
+            elementsToShow = ["#group-container", "#chat-open-button"];
+        } else {
+            elementsToShow = ["#chat", "#group-container"];
+        }
+        dom.hideAllExcept(elementsToShow);
+
+        // Add orientation change function to event listener.
+        addOrientationChangeFunction();
 
         // Tell the server the name of the user.
         const userData: UserData = {
@@ -164,6 +214,19 @@ $(document).ready(function () {
             $("#chat-send-button").on("click", function () {
                 readMsgClearAndSend(chat);
             });
+            $("#chat-open-button").on("click", function () {
+                dom.hideAllExcept(["#chat", "#chat-close-button"]);
+            })
+            $("#chat-close-button").on("click", function () {
+                // Determine which elements to show.
+                let elementsToShow = [];
+                if (dom.isSmartphoneLayout()) {
+                    elementsToShow = ["#group-container", "#chat-open-button"];
+                } else {
+                    elementsToShow = ["#chat", "#group-container"];
+                }
+                dom.hideAllExcept(elementsToShow);
+            })
 
             // On message...
             socket.onmessage = function (e) {
@@ -206,6 +269,9 @@ $(document).ready(function () {
 
 
                 } else if (data.type == SocketEvent.START_GAME_CLIENT) {
+
+                    removeOrientationChangeFunction();
+
                     const payload = data.payload as GameStartData;
                     const otherPlayers = payload.players;
                     for (let i = 0; i < otherPlayers.length; i++) {
@@ -228,17 +294,26 @@ $(document).ready(function () {
 
 
                 } else if (data.type == SocketEvent.END_GAME) {
+                    // Show bg image and make canvas small.
+                    $("body").append('<div id="bg-image"></div>');
+                    game.CANVAS_ELEMENTS.forEach(element => {
+                        $(element).attr("height", 1);
+                        $(element).attr("width", 10);
+                    });
+
+                    // Stop game and read scores from payload.
                     game.stop();
 
                     const scores = data.payload as Scores;
                     scores.forEach(score => {
                         $("#score-table").append(
-                            `<tr class="score-row"><td class="score-name">${score.name}</td><td class="score-time">${msToMmSsMs(score.totalTime)}</td></tr>`
+                            `<tr class="score-row"><td><div class="score-name">${score.name}</div></td><td class="score-time">${msToMmSsMs(score.totalTime)}</td></tr>`
                         );
-                        $("#scores").append(`<div class="score"><div>${score.name}</div><div>${msToMmSsMs(score.totalTime)}</div></div>`);
                     });
+
                     domOperator.hideAllExcept(["#score-modal"]);
 
+                    // Play sound.
                     if (scores[0].userId == user.id) {
                         new Audio("./sound/Congratulations.mp3").play();
                         $("#scores-title").text("Congratulations! You have won the game!");

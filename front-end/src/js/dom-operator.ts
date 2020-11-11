@@ -14,6 +14,7 @@ const allElementsOnPage: Array<string> = [
     "#button-jump",
     "#chat",
     "#chat-open-button",
+    "#chat-close-button",
     "#score-modal"
 ]
 
@@ -30,6 +31,11 @@ const hideAllExcept = function(except: Array<string>): void {
     })
 } 
 
+const isSmartphoneLayout = function(): boolean {
+    return $(window).width() <= 600;
+}
+
 export default {
-    hideAllExcept
+    hideAllExcept,
+    isSmartphoneLayout
 };

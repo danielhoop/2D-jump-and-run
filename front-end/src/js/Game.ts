@@ -11,7 +11,7 @@ class Game {
 
     private _FPS = 22;
     private _INTERVAL = 1000 / this._FPS; // milliseconds
-    private _CANVAS_ELEMENTS = [
+    CANVAS_ELEMENTS = [
         "#map",
         "#player1",
         "#player2",
@@ -23,7 +23,7 @@ class Game {
         "#button-right",
         "#button-jump"
     ]
-    private _GAME_ELEMENTS: Array<string> = Array.prototype.concat(this._CANVAS_ELEMENTS, this._BUTTON_ELEMENTS);
+    private _GAME_ELEMENTS: Array<string> = Array.prototype.concat(this.CANVAS_ELEMENTS, this._BUTTON_ELEMENTS);
 
     private _gameLoopInterval;
     private _framesSinceLastCssStyling = 999;
@@ -185,7 +185,7 @@ class Game {
         const { mapLength, mapWidth, multiplier } = this._map.getMapData().meta;
         const height = mapLength * multiplier;
         const width = mapWidth * multiplier;
-        this._CANVAS_ELEMENTS.forEach(element => {
+        this.CANVAS_ELEMENTS.forEach(element => {
             $(element).attr("height", height);
             $(element).attr("width", width);
         });
