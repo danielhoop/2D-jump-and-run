@@ -89,10 +89,10 @@ export class Map {
                         }
                     }
                 }
+                window.scrollTo(0, $(document).height());
                 i++;
             }
         }, this._msBetweenDrawing);
-        // this._allImagesInOrder.forEach((image: ImageType) => {});
     }
 
     /*

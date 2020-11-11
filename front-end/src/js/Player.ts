@@ -17,7 +17,7 @@ export class Player {
     private _MIN_VELOCITY = 1;
     private _MAX_VELOCITY = 4;
     private _MAX_FIELDS_PER_SECOND = 4;
-    private _JUMP_DISTANCE = 2.3;
+    private _JUMP_DISTANCE = 2.4;
     private _COLLISON_DISTANCE = 2.01;
 
     private _isActor: boolean;
@@ -28,8 +28,8 @@ export class Player {
     private _yAtLastJump: number;
     private _hasJustCollided = false;
     private _isJumping = false;
-    private _x: number;
-    private _y: number;
+    x: number;
+    y: number;
     private _reachedGoal = false;
     private _velocity: number;
     private _fps: number;
@@ -115,8 +115,8 @@ export class Player {
             if (this._reachedGoal || position.x >= this._map.getMapData().meta.mapWidth || position.x < 0) {
                 return;
             }
-            this._x = position.x;
-            this._y = position.y;
+            this.x = position.x;
+            this.y = position.y;
 
             // Do this only for received data.
             if (position.other) {
@@ -129,11 +129,11 @@ export class Player {
             }
 
             // Reset collision and jumping information.
-            this._isJumping = !(this._yAtLastJump - this._y > this._JUMP_DISTANCE);
-            this._hasJustCollided = !(this._yAtLastCollision - this._y > this._COLLISON_DISTANCE);
+            this._isJumping = !(this._yAtLastJump - this.y > this._JUMP_DISTANCE);
+            this._hasJustCollided = !(this._yAtLastCollision - this.y > this._COLLISON_DISTANCE);
 
             // Draw the avatar. But only if not passed through goal.
-            if (this._y >= 0) {
+            if (this.y >= 0) {
                 const m = this._map.getMapData().meta.multiplier;
                 const img = new Image();
                 img.onload = () => {
@@ -159,9 +159,9 @@ export class Player {
 
             // Handle collisions
             if (!this._isJumping) {
-                const playerCoord = { x: this._x, y: this._y };
+                const playerCoord = { x: this.x, y: this.y };
                 if (!this._hasJustCollided && this._map.touchesObstacle(playerCoord)) {
-                    this._yAtLastCollision = this._y;
+                    this._yAtLastCollision = this.y;
                     this.decreaseVelocity();
                     this._hasJustCollided = true;
                 }
@@ -170,39 +170,22 @@ export class Player {
                 }
             }
 
-            // Scroll to right place
-            const viewPortHeight = $(window).height();
-            const documentHeight = $(document).height();
-            const partOfPathTaken = 1 - (this._y / this._map.getMapData().meta.mapLength);
-            const pixelsWalked = partOfPathTaken * documentHeight;
-            let scrollToHeight = documentHeight;
-            if (pixelsWalked > viewPortHeight * 0.34) {
-                scrollToHeight = documentHeight - pixelsWalked - viewPortHeight * 0.66;
-            }
-            window.scrollTo(0, scrollToHeight);
-            /*console.log("documentHeight: " + documentHeight);
-            console.log("viewPortHeight: " + viewPortHeight);
-            console.log("partOfPathTaken: " + partOfPathTaken);
-            console.log("pixelsWalked: " + pixelsWalked);
-            console.log("scrollToHeight: " + scrollToHeight);*/
-
-
             // Send data to other players.
             const posMsg: PlayerPosition = {
                 userId: this._userId,
-                x: this._x,
-                y: this._y,
+                x: this.x,
+                y: this.y,
                 other: true
             };
-            if (this._y <= 0) {
+            if (this.y <= 0) {
                 this._reachedGoal = true;
                 posMsg.goal = true;
                 posMsg.userName = this._user.name;
             }
-            if (this._yAtLastJump == this._y) {
+            if (this._yAtLastJump == this.y) {
                 posMsg.yJump = this._yAtLastJump;
             }
-            if (this._yAtLastCollision == this._y) {
+            if (this._yAtLastCollision == this.y) {
                 posMsg.yColl = this._yAtLastCollision;
             }
 
@@ -221,26 +204,26 @@ export class Player {
         this.drawVelocity();
     }
     private moveForward(): void {
-        const position: PlayerPosition = { x: this._x, y: this._y }
+        const position: PlayerPosition = { x: this.x, y: this.y }
         position.y = position.y - (this._velocity / this._MAX_VELOCITY * this._MAX_FIELDS_PER_SECOND / this._fps);
         this.updatePosition(position);
     }
     moveRight(): void {
-        const position: PlayerPosition = { x: this._x, y: this._y }
+        const position: PlayerPosition = { x: this.x, y: this.y }
         position.x = position.x + 1;
         this.updatePosition(position);
     }
     moveLeft(): void {
-        const position: PlayerPosition = { x: this._x, y: this._y }
+        const position: PlayerPosition = { x: this.x, y: this.y }
         position.x = position.x - 1;
         this.updatePosition(position);
     }
 
     jump(): void {
         if (!this._isJumping) {
-            this._yAtLastJump = this._y;
+            this._yAtLastJump = this.y;
             // To draw immediately another picture. Even though position has not changed.
-            this.updatePosition({ x: this._x, y: this._y });
+            this.updatePosition({ x: this.x, y: this.y });
         }
     }
 
@@ -259,8 +242,8 @@ export class Player {
     }
     private drawVelocity(y: number = undefined): void {
         if (y === undefined) {
-            if (this._y < this._map.getMapData().meta.mapLength - this._MAX_VELOCITY - 3) {
-                y = this._y + this._MAX_VELOCITY + 1
+            if (this.y < this._map.getMapData().meta.mapLength - this._MAX_VELOCITY - 3) {
+                y = this.y + this._MAX_VELOCITY + 1
             }
             if (y === undefined) {
                 y = this._map.getMapData().meta.mapLength - 2;

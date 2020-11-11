@@ -1,5 +1,6 @@
-import dom from "./dom-operator";
+import $ from "jquery";
 
+import dom from "./dom-operator";
 import { Map } from "./Map";
 import { MapData } from "./MapTypes";
 import { Player, Players } from "./Player";
@@ -19,6 +20,7 @@ class Game {
         "#gamepad"];
 
     private _gameLoopInterval;
+    private _framesSinceLastCssStyling = 999;
     private _player: Player;
     private _players: Players;
     private _map: Map;
@@ -50,19 +52,34 @@ class Game {
     }
 
     start(): void {
+        // Prevent default behaviour that browser scrolls to bottom of page when spacebar is pressed.
+        document.documentElement.addEventListener("keydown", (event) => {
+            if (event.key == " ") {
+                event.preventDefault();
+            }
+        }, false);
+
+        dom.hideAllExcept(this._GAME_ELEMENTS);
+
         this._map.draw();
+
+        // Do this 3 times, because the algorithm does not work perfectly when the difference
+        // between "SOLL" and "IST" is too large.
+        //for (let i = 0; i < 3; i++) {
+            this.adjustCanvasCssWidth();
+        //}
+
         this._player.initialize(this._map, this._FPS)
         if (this._players) {
             for (const key in this._players) {
                 this._players[key].initialize(this._map, this._FPS);
             }
         }
-        dom.hideAllExcept(this._GAME_ELEMENTS);
 
         // Wait some time until the map was drawn, then start the game loop.
         const setupInterv = setInterval(() => {
             this._gameLoopInterval = setInterval(() => {
-                this.gameLoop(this)
+                this.gameLoop(this);
             }, this._INTERVAL);
             clearInterval(setupInterv);
         }, this._map.msNeededForDrawing);
@@ -74,8 +91,17 @@ class Game {
 
     private gameLoop(thisObject: Game): void {
         thisObject._player.gameLoop();
+        thisObject.scroll();
         // No game loop for the other players. They have their own game loop
         // and send data via server to this client.
+
+        // Adjust canvas dimensions to the width of the screen.
+        if (this._framesSinceLastCssStyling > this._FPS) {
+            this.adjustCanvasCssWidth();
+            this._framesSinceLastCssStyling = 0;
+        } else {
+            this._framesSinceLastCssStyling++;
+        }
     }
 
     setMap(mapData: MapData): void {
@@ -92,6 +118,47 @@ class Game {
         if (this._players[position.userId]) {
             this._players[position.userId].updatePosition(position);
         }
+    }
+
+
+    private scroll(): void {
+        const viewPortHeight = $(window).height();
+        const documentHeight = $(document).height();
+        const partOfPathTaken = 1 - (this._player.y / this._map.getMapData().meta.mapLength);
+        const pixelsWalked = partOfPathTaken * documentHeight;
+        let scrollToHeight = documentHeight;
+        if (pixelsWalked > viewPortHeight * 0.34) {
+            scrollToHeight = documentHeight - pixelsWalked - viewPortHeight * 0.66;
+        }
+        window.scrollTo(0, scrollToHeight);
+        /*console.log("documentHeight: " + documentHeight);
+        console.log("viewPortHeight: " + viewPortHeight);
+        console.log("partOfPathTaken: " + partOfPathTaken);
+        console.log("pixelsWalked: " + pixelsWalked);
+        console.log("scrollToHeight: " + scrollToHeight);*/
+    }
+
+    // Dynamically style canvas with CSS. Is called after each second.
+    private adjustCanvasCssWidth(): void {
+        const N_SQUARES_VERTICAL = 30;
+        const viewPortHeight = $(window).height();
+        const documentHeight = $(document).height();
+        const nSquaresVertical = this._map.getMapData().meta.mapLength * viewPortHeight / documentHeight;
+        const cssWidthRelativeIs = 100 * parseFloat($(".game-canvas").css("width")) / parseFloat($(".game-canvas").parent().css("width"));
+        const cssWidthRelativeShould = cssWidthRelativeIs * nSquaresVertical / N_SQUARES_VERTICAL;
+        if (Math.abs(cssWidthRelativeShould - cssWidthRelativeIs) > 2) {
+            $(".game-canvas").css("width", cssWidthRelativeShould.toString() + "%");
+            $(".game-canvas").css("margin-left", (-cssWidthRelativeShould / 2).toString() + "%");
+        }
+        $("#group-container").css("position", "absolute");
+        $("#chat").css("position", "absolute");
+        /*
+        console.log("viewPortHeight: " + viewPortHeight);
+        console.log("documentHeight: " + documentHeight);
+        console.log("nSquaresVertical : " + nSquaresVertical);
+        console.log("cssWidthRelative : " + cssWidthRelativeIs);
+        console.log("cssWidthRelativeShould: " + cssWidthRelativeShould);
+        */
     }
 }
 

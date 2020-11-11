@@ -11,7 +11,7 @@ npm install
 Open the shell in this folder, then execute this command:
 ```
 npm install --only=prod
-
+```
 
 # Run the build pipeline
 Open the shell in this folder, then execute this command:

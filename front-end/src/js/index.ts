@@ -118,13 +118,6 @@ let game: Game = undefined;
 
 $(document).ready(function () {
 
-    // Prevent default behaviour that browser scrolls to bottom of page when spacebar is pressed.
-    document.documentElement.addEventListener("keydown", (event) => {
-        if (event.key == " ") {
-            event.preventDefault();
-        }
-    }, false);
-
     // Create a user
     const user: User = createUser("unknown");
 

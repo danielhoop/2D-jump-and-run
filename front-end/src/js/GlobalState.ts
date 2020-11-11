@@ -9,7 +9,7 @@ export class GlobalState {
 
         // Create socket
         // TODO: Read address from environment viable?
-        this._socket = new WebSocket("ws://localhost:8000"); // ws://localhost:8000  ws://192.168.0.171:8000
+        this._socket = new WebSocket("ws://192.168.0.171:8000"); // ws://localhost:8000  ws://192.168.0.171:8000
 
         // On close
         this._socket.onclose = function () {

@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8" /> <!-- name="viewport" content="width=device-width, initial-scale=1.0" -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>5-Seen-Wanderung</title>
     <link rel="stylesheet" href="css/game-elements.css" />
     <link rel="stylesheet" href="css/index.css" />
@@ -13,7 +14,7 @@
         <h1>5-Seen-Wanderung</h1>
     </header> -->
 
-    <!-- <div class="bg-image"></div>*/ -->
+    <!-- <div class="bg-image"></div> -->
 
     <div id="name-modal" class="modal">
         <div class="title-bold">Please enter your nickname</div>
@@ -26,7 +27,7 @@
         <table id="score-table"></table>
     </div>
 
-
+    <div id="main-frame">
     <div id="group-container">
         <div class="title-bold">Choose your group by clicking on it.</div>
 
@@ -63,16 +64,6 @@
 
     </div>
 
-
-
-    <!-- The ratio between height/width has to be the same as the ratio y/x of the game map. -->
-    <canvas id="map" class="game-canvas" height="10" width="10">This is the game.</canvas>
-    <canvas id="gamepad" class="game-canvas" height="10" width="10">This is the gamepad.</canvas>
-    <canvas id="player3" class="game-canvas" height="10" width="10">This is the player3.</canvas>
-    <canvas id="player2" class="game-canvas" height="10" width="10">This is the player2.</canvas>
-    <canvas id="velocity" class="game-canvas" height="10" width="10">This is the game.</canvas>
-    <canvas id="player1" class="game-canvas" height="10" width="10">This is the player1.</canvas>
-
     <div id="chat">
         <div id="chat-close-button"></div>
         <div id="chat-messages">
@@ -98,6 +89,17 @@
         </div>
     </div>
     <div id="chat-open-button"></div>
+</div>
+
+
+    <!-- The ratio between height/width has to be the same as the ratio y/x of the game map. -->
+    <canvas id="map" class="game-canvas" height="10" width="10">This is the game.</canvas>
+    <canvas id="gamepad" class="game-canvas" height="10" width="10">This is the gamepad.</canvas>
+    <canvas id="player3" class="game-canvas" height="10" width="10">This is the player3.</canvas>
+    <canvas id="player2" class="game-canvas" height="10" width="10">This is the player2.</canvas>
+    <canvas id="velocity" class="game-canvas" height="10" width="10">This is the game.</canvas>
+    <canvas id="player1" class="game-canvas" height="10" width="10">This is the player1.</canvas>
+
 
     <!-- <footer>&copy; 2020 Daniel Hoop & Mehrdad Zendehzaban</footer> -->
 
