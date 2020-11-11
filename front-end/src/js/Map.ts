@@ -3,14 +3,6 @@ import { MapContent, MapMetaData, ImageType, MapData, Coord, FieldType, Field } 
 
 export class Map {
 
-    private _GAME_ELEMENTS = [
-        "#map",
-        "#player1",
-        "#player2",
-        "#player3",
-        "#velocity",
-        "#gamepad"];
-
     private _content: MapContent;
     private _meta: MapMetaData;
 
@@ -54,7 +46,6 @@ export class Map {
     setMap(mapData: MapData): void {
         this._meta = mapData.meta;
         this._content = mapData.content;
-        this.setCanvasDimensions();
     }
 
     getMapData(): MapData {
@@ -181,15 +172,5 @@ export class Map {
             return true;
         }
         return false;
-    }
-
-    private setCanvasDimensions(): void {
-        const { mapLength, mapWidth, multiplier } = this._meta;
-        const height = mapLength * multiplier;
-        const width = mapWidth * multiplier;
-        this._GAME_ELEMENTS.forEach(element => {
-            $(element).attr("height", height);
-            $(element).attr("width", width);
-        });
     }
 }

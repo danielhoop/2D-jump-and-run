@@ -110,6 +110,7 @@ class Game {
         } else {
             this._map.setMap(mapData);
         }
+        this.setCanvasDimensions();
     }
 
     updatePlayerPosition(position: PlayerPosition): void {
@@ -159,6 +160,16 @@ class Game {
         console.log("cssWidthRelative : " + cssWidthRelativeIs);
         console.log("cssWidthRelativeShould: " + cssWidthRelativeShould);
         */
+    }
+
+    private setCanvasDimensions(): void {
+        const { mapLength, mapWidth, multiplier } = this._map.getMapData().meta;
+        const height = mapLength * multiplier;
+        const width = mapWidth * multiplier;
+        this._GAME_ELEMENTS.forEach(element => {
+            $(element).attr("height", height);
+            $(element).attr("width", width);
+        });
     }
 }
 
