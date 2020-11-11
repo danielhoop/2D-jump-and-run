@@ -11,13 +11,19 @@ class Game {
 
     private _FPS = 22;
     private _INTERVAL = 1000 / this._FPS; // milliseconds
-    private _GAME_ELEMENTS = [
+    private _CANVAS_ELEMENTS = [
         "#map",
         "#player1",
         "#player2",
         "#player3",
-        "#velocity",
-        "#gamepad"];
+        "#velocity"
+    ];
+    private _BUTTON_ELEMENTS = [
+        "#button-left",
+        "#button-right",
+        "#button-jump"
+    ]
+    private _GAME_ELEMENTS: Array<string> = Array.prototype.concat(this._CANVAS_ELEMENTS, this._BUTTON_ELEMENTS);
 
     private _gameLoopInterval;
     private _framesSinceLastCssStyling = 999;
@@ -28,12 +34,6 @@ class Game {
     constructor(player: Player, players: Players) {
         this._player = player;
         this._players = players;
-
-        //this._map.getCanvas().addEventListener("keydown", (event) => {
-        document.getElementById("gamepad").addEventListener("klck", (event) => {
-            // Do it like this?
-            // https://lavrton.com/hit-region-detection-for-html5-canvas-and-how-to-listen-to-click-events-on-canvas-shapes-815034d7e9f8/
-        });
 
         window.addEventListener("keydown", (event) => {
             const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
@@ -48,6 +48,17 @@ class Game {
             } else if (key == " ") {
                 this._player.jump();
             }
+        });
+
+        // Control buttons for game
+        $("#button-right").on("click", () => {
+            this._player.moveRight();
+        });
+        $("#button-left").on("click", () => {
+            this._player.moveLeft();
+        });
+        $("#button-jump").on("click", () => {
+            this._player.jump();
         });
     }
 
@@ -66,7 +77,7 @@ class Game {
         // Do this 3 times, because the algorithm does not work perfectly when the difference
         // between "SOLL" and "IST" is too large.
         //for (let i = 0; i < 3; i++) {
-            this.adjustCanvasCssWidth();
+        this.adjustCanvasCssWidth();
         //}
 
         this._player.initialize(this._map, this._FPS)
@@ -79,7 +90,7 @@ class Game {
         // Wait some time until the map was drawn, then start the game loop.
         const setupInterv = setInterval(() => {
             this._gameLoopInterval = setInterval(() => {
-                this.gameLoop(this);
+                this.gameLoop();
             }, this._INTERVAL);
             clearInterval(setupInterv);
         }, this._map.msNeededForDrawing);
@@ -89,9 +100,9 @@ class Game {
         clearInterval(this._gameLoopInterval);
     }
 
-    private gameLoop(thisObject: Game): void {
-        thisObject._player.gameLoop();
-        thisObject.scroll();
+    private gameLoop(): void {
+        this._player.gameLoop();
+        this.scroll();
         // No game loop for the other players. They have their own game loop
         // and send data via server to this client.
 
@@ -123,15 +134,20 @@ class Game {
 
 
     private scroll(): void {
+        const REL_Y_POSITION_FROM_BOTTOM = 0.34;
         const viewPortHeight = $(window).height();
         const documentHeight = $(document).height();
         const partOfPathTaken = 1 - (this._player.y / this._map.getMapData().meta.mapLength);
         const pixelsWalked = partOfPathTaken * documentHeight;
         let scrollToHeight = documentHeight;
-        if (pixelsWalked > viewPortHeight * 0.34) {
-            scrollToHeight = documentHeight - pixelsWalked - viewPortHeight * 0.66;
+        if (pixelsWalked > viewPortHeight * REL_Y_POSITION_FROM_BOTTOM) {
+            scrollToHeight = documentHeight - pixelsWalked - viewPortHeight * (1 - REL_Y_POSITION_FROM_BOTTOM);
         }
         window.scrollTo(0, scrollToHeight);
+
+        // Position the game elements
+        // TODO
+
         /*console.log("documentHeight: " + documentHeight);
         console.log("viewPortHeight: " + viewPortHeight);
         console.log("partOfPathTaken: " + partOfPathTaken);
@@ -146,8 +162,11 @@ class Game {
         const documentHeight = $(document).height();
         const nSquaresVertical = this._map.getMapData().meta.mapLength * viewPortHeight / documentHeight;
         const cssWidthRelativeIs = 100 * parseFloat($(".game-canvas").css("width")) / parseFloat($(".game-canvas").parent().css("width"));
-        const cssWidthRelativeShould = cssWidthRelativeIs * nSquaresVertical / N_SQUARES_VERTICAL;
+        let cssWidthRelativeShould = cssWidthRelativeIs * nSquaresVertical / N_SQUARES_VERTICAL;
         if (Math.abs(cssWidthRelativeShould - cssWidthRelativeIs) > 2) {
+            if (cssWidthRelativeShould > 100) {
+                cssWidthRelativeShould = 100;
+            }
             $(".game-canvas").css("width", cssWidthRelativeShould.toString() + "%");
             $(".game-canvas").css("margin-left", (-cssWidthRelativeShould / 2).toString() + "%");
         }
@@ -166,7 +185,7 @@ class Game {
         const { mapLength, mapWidth, multiplier } = this._map.getMapData().meta;
         const height = mapLength * multiplier;
         const width = mapWidth * multiplier;
-        this._GAME_ELEMENTS.forEach(element => {
+        this._CANVAS_ELEMENTS.forEach(element => {
             $(element).attr("height", height);
             $(element).attr("width", width);
         });

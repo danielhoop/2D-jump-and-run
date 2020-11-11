@@ -61,25 +61,13 @@ footer {
     border-radius: 5px;
 }
 
-.game-canvas2 {
-    /*width: 1200px;*/
-    height: 70%;
-    /*visibility: hidden;*/
+/* https://stackoverflow.com/questions/982054/how-to-center-an-element-in-the-middle-of-the-browser-window */
+/* The width of the canvas will be adjusted by Javascript. It depends on the number of elements in the game map. */
+.game-canvas {
     position: absolute;
-    top: 30px;
-    left: 30px;
-}
-
-#gamepad {
-    z-index: 1;
-}
-
-#game-frame {
-    position: absolute;
-    top: 30px;
-    left: 30px;
-    height: 30%;
-    overflow: auto;
+    width: 30%;
+    left: 50%;
+    margin-left: -15%;
 }
 
 .group {
@@ -178,7 +166,7 @@ footer {
 }
 
 /*
-.button-right {
+.chat-button-right {
     padding-left: 50%;
     padding: 0px 0px 0px 16px !important;
     border: none;
@@ -214,7 +202,7 @@ footer {
     margin-right: 10px;
 }
 
-.button-right {
+.chat-button-right {
     display: table-cell;
     min-width: 50px;
 }
@@ -236,29 +224,7 @@ footer {
     border-color: inherit;
 }
 
-/* https://stackoverflow.com/questions/982054/how-to-center-an-element-in-the-middle-of-the-browser-window */
-.game-canvas {
-    position: absolute;
-    width: 30%;
-    left: 50%;
-    margin-left: -15%;
-}
-/*
-.game-canvas {
-    position: absolute;
-    width: 30%;
-    left: 50%;
-    margin-left: -15%;
-}
-.game-canvas {
-    position: absolute;
-    width: 95%;
-    left: 50%;
-    margin-left: -47.5%;
-}*/
-
 @media only screen and (min-width: 601px) {
-    
     #group-container {
         background: rgba(187, 187, 187, 0.5);
         position: absolute;
@@ -280,6 +246,33 @@ footer {
         height: 50%;
         /* border: 3px solid rgba(30, 30, 30, 0.5); */
         border-radius: 10px;
+        visibility: hidden;
+    }
+
+    #button-right {
+        position: fixed;
+        bottom: 5%;
+        right: 10%;
+        
+        width: 5%;
+        visibility: hidden;
+    }
+    #button-left {
+        position: fixed;
+        bottom: 5%;
+        left: 10%;
+    
+        width: 5%;
+        visibility: hidden;
+    }
+    #button-jump {
+        position: fixed;
+        bottom: 5%;
+    
+        width: 5%;
+        right: 20%;
+        /*left: 50%;
+        margin-left: -2.5%;*/
         visibility: hidden;
     }
 }
@@ -315,5 +308,32 @@ footer {
 
         grid-column: 1;
         grid-row: 1;
+    }
+
+    #button-right {
+        position: fixed;
+        bottom: 7%;
+        right: 10%;
+        
+        width: 10%;
+        visibility: hidden;
+    }
+    #button-left {
+        position: fixed;
+        bottom: 7%;
+        left: 10%;
+    
+        width: 10%;
+        visibility: hidden;
+    }
+    #button-jump {
+        position: fixed;
+        bottom: 7%;
+    
+        width: 10%;
+        right: 35%;
+        /*left: 50%;
+        margin-left: -5%;*/
+        visibility: hidden;
     }
 }

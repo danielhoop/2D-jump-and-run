@@ -82,7 +82,7 @@
             <div class="text-field-left">
                 <input id="chat-editor" type="text" value=""></input>
             </div>
-            <div class="button-right">
+            <div class="chat-button-right">
                 <button id="chat-send-button" type="button" class="button button-small button-assertive"> >
                 </button>
             </div>
@@ -93,13 +93,26 @@
 
 
     <!-- The ratio between height/width has to be the same as the ratio y/x of the game map. -->
-    <canvas id="map" class="game-canvas" height="10" width="10">This is the game.</canvas>
-    <canvas id="gamepad" class="game-canvas" height="10" width="10">This is the gamepad.</canvas>
-    <canvas id="player3" class="game-canvas" height="10" width="10">This is the player3.</canvas>
-    <canvas id="player2" class="game-canvas" height="10" width="10">This is the player2.</canvas>
-    <canvas id="velocity" class="game-canvas" height="10" width="10">This is the game.</canvas>
-    <canvas id="player1" class="game-canvas" height="10" width="10">This is the player1.</canvas>
+    <canvas id="map" class="game-canvas" height="1" width="10">This is the game.</canvas>
+    <canvas id="player3" class="game-canvas" height="1" width="10">This is the player3.</canvas>
+    <canvas id="player2" class="game-canvas" height="1" width="10">This is the player2.</canvas>
+    <canvas id="velocity" class="game-canvas" height="1" width="10">This is the game.</canvas>
+    <canvas id="player1" class="game-canvas" height="1" width="10">This is the player1.</canvas>
 
+    
+    <input id="button-right" type="image" src="./img/arrow-right.png" />
+    <input id="button-jump" type="image" src="./img/arrow-up.png" />
+    <input id="button-left" type="image" src="./img/arrow-left.png" />
+    <!--
+    <div id="button-right" style="position: fixed; bottom: 0;">
+        
+    </div>
+    <div id="button-left-div">
+        
+    </div>
+    <div id="button-jump-div">
+        
+    </div>-->
 
     <!-- <footer>&copy; 2020 Daniel Hoop & Mehrdad Zendehzaban</footer> -->
 
