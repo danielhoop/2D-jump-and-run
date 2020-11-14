@@ -9,7 +9,7 @@ import { PlayerPosition } from "./types";
 class Game {
     // Canvas viewport https://stackoverflow.com/questions/16919601/html5-canvas-camera-viewport-how-to-actually-do-it
 
-    private _FPS = 22;
+    private _FPS = 25;
     private _INTERVAL = 1000 / this._FPS; // milliseconds
     CANVAS_ELEMENTS = [
         "#map",

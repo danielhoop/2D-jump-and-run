@@ -271,6 +271,7 @@ $(document).ready(function () {
                 } else if (data.type == SocketEvent.START_GAME_CLIENT) {
 
                     removeOrientationChangeFunction();
+                    $("#bg-image").remove();
 
                     const payload = data.payload as GameStartData;
                     const otherPlayers = payload.players;
