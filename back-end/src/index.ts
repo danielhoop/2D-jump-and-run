@@ -182,7 +182,7 @@ const switchToNextLevelOrStopGame = function (roomId: string) {
         scores.forEach(score => {
             db.addScore(score.userId, score.name, score.totalTime, roomId);
         });
-        
+
 
     } else {
 
@@ -273,13 +273,23 @@ server.on("connection", function (socket) {
             if (position.yColl == position.y) {
                 db.addGameEvent(position.userId, GameEvent.COLLISION, position.x, position.y, new Date().getTime());
             }
-
             if (position.goal) {
+                const room = rooms[msgData.roomId];
+
+                // Check that player was not faster than is theoretically possble (cheating)
+                let endingTime = new Date().getTime();
+                let timeNeeded = endingTime - room.startingTime;
+                const fastestTimePossible = (mapLevelMetaData[room.level].mapLength / constants.MAX_FIELDS_PER_SECOND) * 1000;
+
+                if (timeNeeded < fastestTimePossible) {
+                    endingTime = room.startingTime + (constants.PENALTY_SECONDS_FOR_CHEATING * 1000);
+                    timeNeeded = endingTime - room.startingTime;
+                }
+
+                // Save to database.
                 db.addGameEvent(position.userId, GameEvent.GOAL, position.x, position.y, new Date().getTime());
 
-                const room = rooms[msgData.roomId];
-                const timeNeeded = new Date().getTime() - room.startingTime;
-
+                // Add information to rooms list.
                 room.playersAtEndOfMap.push(position.userId);
                 room.scores[position.userId].push(timeNeeded);
 
@@ -289,6 +299,7 @@ server.on("connection", function (socket) {
                     return;
                 }
             }
+
             sendToRoom(txt, msgData.roomId, position.userId);
             return;
         }

@@ -10,7 +10,9 @@ export const constants = {
     BUTTON_GROUP_1: "button-group-id-1",
     BUTTON_GROUP_2: "button-group-id-2",
     BUTTON_GROUP_3: "button-group-id-3",
-    MAX_ROOM_SIZE: 3
+    MAX_ROOM_SIZE: 3,
+    MAX_FIELDS_PER_SECOND: 4,
+    PENALTY_SECONDS_FOR_CHEATING: 5*60
 }
 
 export enum SocketEvent {

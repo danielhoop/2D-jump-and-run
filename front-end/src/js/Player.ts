@@ -1,7 +1,7 @@
 import { GlobalState } from "./GlobalState";
 
 import { Map } from "./Map";
-import { PlayerPosition, SocketData, SocketEvent, UserData } from "./types";
+import { constants, PlayerPosition, SocketData, SocketEvent, UserData } from "./types";
 import { User } from "./User";
 
 export type Players = Record<string, Player>;
@@ -15,7 +15,7 @@ export class Player {
 
     private _MIN_VELOCITY = 1;
     private _MAX_VELOCITY = 4;
-    private _MAX_FIELDS_PER_SECOND = 4;
+    private _MAX_FIELDS_PER_SECOND = constants.MAX_FIELDS_PER_SECOND;
     private _JUMP_DISTANCE = 2.4;
     private _COLLISON_DISTANCE = 2.01;
 
