@@ -30,12 +30,14 @@ footer {
     margin-bottom: 5px;
 }
 
-#bg-image {
-    /* The image used */
-    background-image: url("../img/background.jpg");
-    /* Add the blur effect */
-    filter: blur(8px);
-    -webkit-filter: blur(8px);
+#bg-lake {
+    background-image: url("../img/bg-lake.jpg");
+}
+#bg-gondola {
+    background-image: url("../img/bg-gondola.jpg");
+}
+
+.bg-image {
     /* Full height */
     height: 100%;
     width: 100%;
@@ -43,6 +45,12 @@ footer {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+}
+
+.bg-blurred {
+    /* Add the blur effect */
+    filter: blur(8px);
+    -webkit-filter: blur(8px);
 }
 
 .modal {

@@ -271,7 +271,7 @@ $(document).ready(function () {
                 } else if (data.type == SocketEvent.START_GAME_CLIENT) {
 
                     removeOrientationChangeFunction();
-                    $("#bg-image").remove();
+                    $("#bg-lake").remove();
 
                     const payload = data.payload as GameStartData;
                     const otherPlayers = payload.players;
@@ -295,8 +295,7 @@ $(document).ready(function () {
 
 
                 } else if (data.type == SocketEvent.END_GAME) {
-                    // Show bg image and make canvas small.
-                    $("body").append('<div id="bg-image"></div>');
+                    // Make canvas small.
                     game.CANVAS_ELEMENTS.forEach(element => {
                         $(element).attr("height", 1);
                         $(element).attr("width", 10);
@@ -316,11 +315,13 @@ $(document).ready(function () {
 
                     // Play sound.
                     if (scores[0].userId == user.id) {
+                        $("body").append('<div id="bg-lake" class="bg-image"></div>');
                         new Audio("./sound/Congratulations.mp3").play();
-                        $("#scores-title").text("Congratulations! You have won the game!");
+                        $("#score-title").text("Congratulations! You have won the game!");
                     } else {
+                        $("body").append('<div id="bg-gondola" class="bg-image bg-blurred"></div>');
                         new Audio("./sound/MaybeNextTime.mp3").play();
-                        $("#scores-title").text("Maybe next time...");
+                        $("#score-title").text("Maybe next time...");
                     }
 
                 }
