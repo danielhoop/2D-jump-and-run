@@ -1,6 +1,6 @@
 import $ from "jquery";
 
-import dom from "./dom-operator";
+import dom from "./DomOperator";
 import Game from "./Game";
 import Chat from "./Chat"
 import {
@@ -19,7 +19,7 @@ import {
 import { Player } from "./Player";
 import { GlobalState } from "./GlobalState";
 import { MapData } from "./MapTypes";
-import domOperator from "./dom-operator";
+import domOperator from "./DomOperator";
 
 
 // Orientation handling
@@ -28,7 +28,7 @@ let previousHeightWidth = $(window).width() + $(window).height();
 let previousOrientation = window.orientation;
 let orientationChangeInterval = null;
 
-const checkOrientation = function () {
+const checkScreenOrientation = function () {
     const currentHeightWith = $(window).width() + $(window).height();
     if (window.orientation !== previousOrientation || currentHeightWith != previousHeightWidth) {
         previousOrientation = window.orientation;
@@ -46,16 +46,16 @@ const checkOrientation = function () {
 };
 
 const addOrientationChangeFunction = function () {
-    window.addEventListener("resize", checkOrientation, false);
-    window.addEventListener("orientationchange", checkOrientation, false);
+    window.addEventListener("resize", checkScreenOrientation, false);
+    window.addEventListener("orientationchange", checkScreenOrientation, false);
 
     // (optional) Android doesn't always fire orientationChange on 180 degree turns
-    orientationChangeInterval = setInterval(checkOrientation, 2000);
+    orientationChangeInterval = setInterval(checkScreenOrientation, 2000);
 }
 
 const removeOrientationChangeFunction = function () {
-    window.removeEventListener("resize", checkOrientation, false);
-    window.removeEventListener("orientationchange", checkOrientation, false);
+    window.removeEventListener("resize", checkScreenOrientation, false);
+    window.removeEventListener("orientationchange", checkScreenOrientation, false);
     clearInterval(orientationChangeInterval);
 }
 

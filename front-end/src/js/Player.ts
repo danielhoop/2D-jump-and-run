@@ -1,4 +1,3 @@
-import $ from "jquery";
 import { GlobalState } from "./GlobalState";
 
 import { Map } from "./Map";
@@ -134,25 +133,10 @@ export class Player {
 
             // Draw the avatar. But only if not passed through goal.
             if (this.y >= 0) {
-                const m = this._map.getMapData().meta.multiplier;
-                const img = new Image();
-                img.onload = () => {
-                    // Drawing the image with coordinates pointing to top-left corner.
-                    this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-                    if (this._isJumping) {
-                        // Shadow below figure. Figure is slightly larger than usually.
-                        this._ctx.fillStyle = "gray";
-                        this._ctx.fillRect(position.x * m - m * 0.40, position.y * m - m * 0.40, m * 1.60, m * 1.60);
-                        this._ctx.drawImage(img, position.x * m - m * 0.20, position.y * m - m * 0.20, m * 1.20, m * 1.20);
-                    } else {
-                        // Normal sized figure.
-                        this._ctx.drawImage(img, position.x * m, position.y * m, m, m);
-                    }
-                }
-                img.src = this._imgPath;
+                this.drawAvatar();
             }
 
-            // If it is not the actor, playing the game, then do not handle collsions and do not scroll.
+            // If it is not the actor, playing the game, then do not handle collsions.
             if (position.other) {
                 return;
             }
@@ -203,6 +187,7 @@ export class Player {
         this.moveForward();
         this.drawVelocity();
     }
+
     private moveForward(): void {
         const position: PlayerPosition = { x: this.x, y: this.y }
         position.y = position.y - (this._velocity / this._MAX_VELOCITY * this._MAX_FIELDS_PER_SECOND / this._fps);
@@ -218,7 +203,6 @@ export class Player {
         position.x = position.x - 1;
         this.updatePosition(position);
     }
-
     jump(): void {
         if (!this._isJumping) {
             this._yAtLastJump = this.y;
@@ -260,5 +244,24 @@ export class Player {
             }
         }
         img.src = this._veloImgPath;
+    }
+
+    private drawAvatar(): void {
+        const m = this._map.getMapData().meta.multiplier;
+                const img = new Image();
+                img.onload = () => {
+                    // Drawing the image with coordinates pointing to top-left corner.
+                    this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+                    if (this._isJumping) {
+                        // Shadow below figure. Figure is slightly larger than usually.
+                        this._ctx.fillStyle = "gray";
+                        this._ctx.fillRect(this.x * m - m * 0.40, this.y * m - m * 0.40, m * 1.60, m * 1.60);
+                        this._ctx.drawImage(img, this.x * m - m * 0.20, this.y * m - m * 0.20, m * 1.20, m * 1.20);
+                    } else {
+                        // Normal sized figure.
+                        this._ctx.drawImage(img, this.x * m, this.y * m, m, m);
+                    }
+                }
+                img.src = this._imgPath;
     }
 }

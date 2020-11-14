@@ -1,6 +1,6 @@
 import $ from "jquery";
 
-import dom from "./dom-operator";
+import dom from "./DomOperator";
 import { Map } from "./Map";
 import { MapData } from "./MapTypes";
 import { Player, Players } from "./Player";

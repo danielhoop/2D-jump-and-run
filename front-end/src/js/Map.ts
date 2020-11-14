@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { MapContent, MapMetaData, ImageType, MapData, Coord, FieldType, Field } from "./MapTypes";
+import { MapContent, MapMetaData, ImageType, MapData, Coord, FieldType } from "./MapTypes";
 
 export class Map {
 
@@ -121,7 +121,7 @@ export class Map {
 
     getStartingPoint(): Coord {
         return {
-            x: this._meta.mapWidth / 2,
+            x: Math.floor(this._meta.mapWidth / 2),
             y: this._meta.mapLength - 2
         };
     }
