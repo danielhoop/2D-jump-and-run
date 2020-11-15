@@ -279,9 +279,13 @@ server.on("connection", function (socket) {
                 // Check that player was not faster than is theoretically possble (cheating)
                 let endingTime = new Date().getTime();
                 let timeNeeded = endingTime - room.startingTime;
-                const fastestTimePossible = (mapLevelMetaData[room.level].mapLength / constants.MAX_FIELDS_PER_SECOND) * 1000;
+                // 2 fields don't have to be walked, because the player starts at the second field.
+                const fastestTimePossible = ((mapLevelMetaData[room.level].mapLength - 2) / constants.MAX_FIELDS_PER_SECOND) * 1000;
 
                 if (timeNeeded < fastestTimePossible) {
+                    console.log(`The player ${position.userId} has cheated! Getting ${constants.PENALTY_SECONDS_FOR_CHEATING} penalty seconds.`)
+                    console.log("  timeNeeded: " + timeNeeded);
+                    console.log("  fastestTimePossible: " + fastestTimePossible);
                     endingTime = room.startingTime + (constants.PENALTY_SECONDS_FOR_CHEATING * 1000);
                     timeNeeded = endingTime - room.startingTime;
                 }

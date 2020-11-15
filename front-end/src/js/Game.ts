@@ -163,6 +163,9 @@ class Game {
         const nSquaresVertical = this._map.getMapData().meta.mapLength * viewPortHeight / documentHeight;
         const cssWidthRelativeIs = 100 * parseFloat($(".game_canvas").css("width")) / parseFloat($(".game_canvas").parent().css("width"));
         let cssWidthRelativeShould = cssWidthRelativeIs * nSquaresVertical / N_SQUARES_VERTICAL;
+        if (viewPortHeight == documentHeight && this._map.getMapData().meta.mapLength <= N_SQUARES_VERTICAL) {
+            cssWidthRelativeShould = 100;
+        }
         if (Math.abs(cssWidthRelativeShould - cssWidthRelativeIs) > 2) {
             if (cssWidthRelativeShould > 100) {
                 cssWidthRelativeShould = 100;
