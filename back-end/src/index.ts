@@ -17,7 +17,7 @@ import {
 import { createMap, mapLevelMetaData } from "./MapCreator";
 import { MapData } from "./MapTypes";
 import Database from "./Database";
-
+import config from "./config/config";
 
 interface UserDataAndSocket {
     user: UserData,
@@ -42,8 +42,7 @@ const createEmptyRoom = function (): RoomData {
 }
 
 // --- Attributes ---
-const PORT = 8000;
-const server = new ws.Server({ port: PORT });
+const server = new ws.Server({ port: config.port });
 const db = new Database();
 
 const userDataList: Record<string, UserDataAndSocket> = {};
@@ -426,4 +425,4 @@ server.on("connection", function (socket) {
 });
 
 console.log("Server is running.");
-console.log("Listening to port: " + PORT);
+console.log("Listening to port: " + config.port);
