@@ -11,7 +11,8 @@ import {
     PlayerPosition,
     Scores,
     Score,
-    GameEvent
+    GameEvent,
+    ScorePayload
 } from "./types";
 import { createMap, mapLevelMetaData } from "./MapCreator";
 import { MapData } from "./MapTypes";
@@ -171,10 +172,15 @@ const switchToNextLevelOrStopGame = function (roomId: string) {
         // Sort scores in ascending order
         scores = _.sortBy(scores, function (o: Score) { return o.totalTime; });
 
+        const scorePayload: ScorePayload = {
+            thisGame: scores,
+            allGames: db.getBestScoresEver(3)
+        };
+
         // Send scores to players
         const scoresMsg: SocketData = {
             type: SocketEvent.END_GAME,
-            payload: scores
+            payload: scorePayload
         }
         sendToRoom(JSON.stringify(scoresMsg), roomId);
 

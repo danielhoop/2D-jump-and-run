@@ -17,6 +17,7 @@ import {
     GameStartData,
     PlayerPosition,
     Scores,
+    ScorePayload,
 } from "./types";
 import { Player } from "./Player";
 import { GlobalState } from "./GlobalState";
@@ -309,17 +310,28 @@ $(document).ready(function () {
                     // Stop game and read scores from payload.
                     game.stop();
 
-                    const scores = data.payload as Scores;
-                    scores.forEach(score => {
-                        $("#score_table").append(
-                            `<tr class="score-row"><td><div class="score_name">${score.name}</div></td><td class="score_time">${msToMmSsMs(score.totalTime)}</td></tr>`
+                    const scorePayload: ScorePayload = data.payload;
+
+                    // This game
+                    const thisGameScores = scorePayload.thisGame;
+                    thisGameScores.forEach(score => {
+                        $("#score_table_this").append(
+                            `<tr class="score_row"><td><div class="score_name">${score.name}</div></td><td class="score_time">${msToMmSsMs(score.totalTime)}</td></tr>`
+                        );
+                    });
+
+                    // Hall of fame (all games)
+                    const allGamesScores = scorePayload.allGames;
+                    allGamesScores.forEach(score => {
+                        $("#score_table_all").append(
+                            `<tr class="score_row"><td><div class="score_name">${score.name}</div></td><td class="score_time">${msToMmSsMs(score.totalTime)}</td></tr>`
                         );
                     });
 
                     domOperator.hideAllExcept(["#score_modal"]);
 
                     // Play sound.
-                    if (scores[0].userId == user.id) {
+                    if (thisGameScores[0].userId == user.id) {
                         $("body").append('<div id="bg_lake" class="bg_image"></div>');
                         new Audio("./sound/Congratulations.mp3").play();
                         $("#score_title").text(translator.getTxtForTag(Lang.Tag.congratulations));

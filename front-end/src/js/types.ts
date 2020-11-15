@@ -23,7 +23,7 @@ export enum SocketEvent {
     START_GAME_SERVER = "START_GAME_SERVER",
     NEXT_LVL = "NEXT_LVL",
     END_GAME = "END_GAME",
-    POSITION = "POSITION"
+    POSITION = "P"
 }
 
 export enum GameEvent {
@@ -65,3 +65,8 @@ export interface GameStartData {
 
 export type Score = { userId: string, name: string, totalTime: number };
 export type Scores = Array<Score>;
+
+export type ScorePayload = {
+    thisGame: Scores,
+    allGames: Scores
+}

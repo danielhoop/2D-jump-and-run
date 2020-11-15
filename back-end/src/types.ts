@@ -3,13 +3,13 @@ import { MapData } from "./MapTypes";
 export const constants = {
     INITIAL_USER_NAME: "xeox7xmknUQlMWB8D0IR",
     LOBBY: "LOBBY",
-    GROUP_0: "group-id-0",
-    GROUP_1: "group-id-1",
-    GROUP_2: "group-id-2",
-    GROUP_3: "group-id-3",
-    BUTTON_GROUP_1: "button-group-id-1",
-    BUTTON_GROUP_2: "button-group-id-2",
-    BUTTON_GROUP_3: "button-group-id-3",
+    GROUP_0: "group_id_0",
+    GROUP_1: "group_id_1",
+    GROUP_2: "group_id_2",
+    GROUP_3: "group_id_3",
+    BUTTON_GROUP_1: "button_group_id_1",
+    BUTTON_GROUP_2: "button_group_id_2",
+    BUTTON_GROUP_3: "button_group_id_3",
     MAX_ROOM_SIZE: 3,
     MAX_FIELDS_PER_SECOND: 4,
     PENALTY_SECONDS_FOR_CHEATING: 5*60
@@ -23,7 +23,7 @@ export enum SocketEvent {
     START_GAME_SERVER = "START_GAME_SERVER",
     NEXT_LVL = "NEXT_LVL",
     END_GAME = "END_GAME",
-    POSITION = "POSITION"
+    POSITION = "P"
 }
 
 export enum GameEvent {
@@ -65,3 +65,8 @@ export interface GameStartData {
 
 export type Score = { userId: string, name: string, totalTime: number };
 export type Scores = Array<Score>;
+
+export type ScorePayload = {
+    thisGame: Scores,
+    allGames: Scores
+}

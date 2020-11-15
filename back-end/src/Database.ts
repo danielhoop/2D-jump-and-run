@@ -1,5 +1,7 @@
 import sql from "sqlite3";
-import { GameEvent } from "./types";
+import sqlSync from "better-sqlite3";
+
+import { GameEvent, Scores } from "./types";
 sql.verbose();
 
 export default class Database {
@@ -61,6 +63,10 @@ export default class Database {
         });
     }
 
+    private openSyncConnection(): sqlSync.Database {
+        return new sqlSync(this.FILENAME);
+    }
+
     addRoom(roomId: string, startTimestamp: number): void {
         const db = this.openConnection();
         const qu = "INSERT INTO room (roomId, startTimestamp) VALUES (?, ?)";
@@ -105,6 +111,13 @@ export default class Database {
         db.close();
     }
 
+    getBestScoresEver(howMany = 10): Scores {
+        const sql = "SELECT userId, userName as 'name', totalTime FROM score ORDER BY totalTime ASC LIMIT " + howMany + ";"
+        const db = this.openSyncConnection();
+        const scores = db.prepare(sql).all();
+        db.close();
+        return scores;
+    }
     /*
     console.log("Does the score table exist? " + this.doesTableExist(db, "score"));
     private doesTableExist(db: sql.Database, tableName: string): boolean {

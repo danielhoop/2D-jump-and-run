@@ -45,6 +45,7 @@ footer {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    position: absolute;
 }
 
 .bg_blurred {
@@ -112,7 +113,7 @@ footer {
     visibility: hidden;
 }
 
-#score_table {
+#score_table_this {
     text-align: center;
 }
 
