@@ -34,16 +34,16 @@ class Chat {
     }
 
     receiveMsg(msg: ChatMessage): void {
-        const msgClass = msg.user.id == this.user.id ? "msg-own" : "msg-other";
-        $("#chat-messages").append(
+        const msgClass = msg.user.id == this.user.id ? "msg_own" : "msg_other";
+        $("#chat_messages").append(
             '<div class = "' + msgClass + '"> \
-            <div class = "msg-sender">' + msg.user.name + '</div> \
-            <div class = "msg-txt">' + msg.txt + '</div> \
+            <div class = "msg_sender">' + msg.user.name + '</div> \
+            <div class = "msg_txt">' + msg.txt + '</div> \
             </div>'
         );
 
         // Always scroll down
-        const element = $("#chat-messages").get(0);
+        const element = $("#chat_messages").get(0);
         element.scrollTop = element.scrollHeight;
 
         // this.msgs.push(msg);

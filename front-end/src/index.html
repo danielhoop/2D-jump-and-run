@@ -10,104 +10,93 @@
 
 <body>
 
-    <div id="bg-lake" class="bg-image bg-blurred"></div>
+    <div id="bg_lake" class="bg_image bg_blurred"></div>
 
-    <div id="name-modal" class="modal">
-        <div class="title-bold">Please enter your nickname</div>
-        <input id="name-editor" type="text" value=""></input>
-        <button id="name-enter-button" type="button">Proceed</button>
+    <div id="name_modal" class="modal">
+        <div id="name_editor_title" class="title_bold">Please enter your nickname</div>
+        <input id="name_editor" type="text" value=""></input>
+        <button id="name_enter_button" type="button">Proceed</button>
     </div>
 
-    <div id="score-modal" class="modal">
-        <div id="score-title" class="title-bold">And the winner is...</div>
-        <table id="score-table"></table>
+    <div id="score_modal" class="modal">
+        <div id="score_title" class="title_bold">And the winner is...</div>
+        <table id="score_table"></table>
     </div>
 
-    <!-- <div id="main-frame"> -->
-    <div id="group-container">
-        <div class="title-bold">Choose your group by clicking on it.</div>
+    <div id="group_container">
+        <div id="choose_group_title" class="title_bold">Choose your group by clicking on it.</div>
 
-        <div id="group-id-0" class="group">
-            <div class="group-name">Lobby</div>
-            <div class="group-members">
-                <!-- <div class="group-member" id="group-member-id-19819832179">Daniel</div> -->
+        <div id="group_id_0" class="group">
+            <div id="goup_lobby_title" class="group_name">Lobby</div>
+            <div class="group_members">
+                <!-- <div class="group_member" id="group_member_id_19819832179">Daniel</div> -->
             </div>
         </div>
 
-        <div id="group-id-1" class="group">
-            <div class="group-name">Game 1</div>
-            <div class="group-members">
-                <!-- <div class="group-member" id="group-member-id-10923840923">Martin</div> -->
+        <div id="group_id_1" class="group">
+            <div id="group_1_title" class="group_name">Game 1</div>
+            <div class="group_members">
+                <!-- <div class="group_member" id="group_member_id_10923840923">Martin</div> -->
             </div>
         </div>
-        <button id="button-group-id-1" type="button" class="group-button">Start Game 1!</button>
+        <button id="button_group_id_1" type="button" class="group_button">Start Game 1!</button>
 
-        <div id="group-id-2" class="group">
-            <div class="group-name">Game 2</div>
-            <div class="group-members">
-                <div class="group-member"></div>
+        <div id="group_id_2" class="group">
+            <div id="group_2_title" class="group_name">Game 2</div>
+            <div class="group_members">
+                <div class="group_member"></div>
             </div>
         </div>
-        <button id="button-group-id-2" type="button" class="group-button">Start Game 2!</button>
+        <button id="button_group_id_2" type="button" class="group_button">Start Game 2!</button>
 
-        <div id="group-id-3" class="group">
-            <div class="group-name">Game 3</div>
-            <div class="group-members">
-                <div class="group-member"></div>
+        <div id="group_id_3" class="group">
+            <div id="group_3_title" class="group_name">Game 3</div>
+            <div class="group_members">
+                <div class="group_member"></div>
             </div>
         </div>
-        <button id="button-group-id-3" type="button" class="group-button">Start Game 3!</button>
+        <button id="button_group_id_3" type="button" class="group_button">Start Game 3!</button>
 
     </div>
 
     <div id="chat">
-        <div id="chat-messages">
+        <div id="chat_messages">
             <!--
-            <div class="msg-other">
-                <div class="msg-sender">Other person</div>
-                <div class="msg-txt">This is how a message of another person looks like.</div>
+            <div class="msg_other">
+                <div class="msg_sender">Other person</div>
+                <div class="msg_txt">This is how a message of another person looks like.</div>
             </div>
-            <div class="msg-own">
-                <div class="msg-sender" id="msg-sender-initially">Your name</div>
-                <div class="msg-txt">This is how your messages look like</div>
+            <div class="msg_own">
+                <div class="msg_sender" id="msg_sender_initially">Your name</div>
+                <div class="msg_txt">This is how your messages look like</div>
             </div>
             -->
         </div>
-        <div id="chat-input-line">
-            <div class="text-field-left">
-                <input id="chat-editor" type="text" value=""></input>
+        <div id="chat_input_line">
+            <div class="text_field_left">
+                <input id="chat_editor" type="text" value=""></input>
             </div>
-            <div class="chat-button-right">
-                <button id="chat-send-button" type="button" class="button button-small button-assertive"> >
+            <div class="chat_button_right">
+                <button id="chat_send_button" type="button" class="button button_small button_assertive"> >
                 </button>
             </div>
         </div>
     </div>
-    <input id="chat-open-button" type="image" src="./img/chat-send-button.png" />
-    <input id="chat-close-button" type="image" src="./img/arrow-down.png" />
+    <input id="chat_open_button" type="image" src="./img/chat-send-button.png" />
+    <input id="chat_close_button" type="image" src="./img/arrow-down.png" />
 
 
     <!-- The ratio between height/width has to be the same as the ratio y/x of the game map. -->
-    <canvas id="map" class="game-canvas" height="1" width="10">This is the game.</canvas>
-    <canvas id="player3" class="game-canvas" height="1" width="10">This is the player3.</canvas>
-    <canvas id="player2" class="game-canvas" height="1" width="10">This is the player2.</canvas>
-    <canvas id="velocity" class="game-canvas" height="1" width="10">This is the game.</canvas>
-    <canvas id="player1" class="game-canvas" height="1" width="10">This is the player1.</canvas>
+    <canvas id="map" class="game_canvas" height="1" width="10">This is the game.</canvas>
+    <canvas id="player3" class="game_canvas" height="1" width="10">This is the player3.</canvas>
+    <canvas id="player2" class="game_canvas" height="1" width="10">This is the player2.</canvas>
+    <canvas id="velocity" class="game_canvas" height="1" width="10">This is the game.</canvas>
+    <canvas id="player1" class="game_canvas" height="1" width="10">This is the player1.</canvas>
 
 
-    <input id="button-right" type="image" src="./img/arrow-right.png" />
-    <input id="button-jump" type="image" src="./img/arrow-up.png" />
-    <input id="button-left" type="image" src="./img/arrow-left.png" />
-    <!--
-    <div id="button-right" style="position: fixed; bottom: 0;">
-        
-    </div>
-    <div id="button-left-div">
-        
-    </div>
-    <div id="button-jump-div">
-        
-    </div>-->
+    <input id="button_right" type="image" src="./img/arrow-right.png" />
+    <input id="button_jump" type="image" src="./img/arrow-up.png" />
+    <input id="button_left" type="image" src="./img/arrow-left.png" />
 
     <!-- <footer>&copy; 2020 Daniel Hoop & Mehrdad Zendehzaban</footer> -->
 

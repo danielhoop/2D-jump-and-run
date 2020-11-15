@@ -1,11 +1,10 @@
-import config from "./config"
+import config from "../config/config";
 
 export class GlobalState {
 
     private _socket: WebSocket;
     private static _instance: GlobalState;
     private serverAddress: string;
-
 
     private constructor() {
 

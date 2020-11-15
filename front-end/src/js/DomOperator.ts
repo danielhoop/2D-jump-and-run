@@ -2,20 +2,20 @@ import $ from "jquery";
 
 const allElementsOnPage: Array<string> = [
     "#title",
-    "#group-container",
-    "#name-modal",
+    "#group_container",
+    "#name_modal",
     "#map",
     "#player1",
     "#player2",
     "#player3",
     "#velocity",
-    "#button-left",
-    "#button-right",
-    "#button-jump",
+    "#button_left",
+    "#button_right",
+    "#button_jump",
     "#chat",
-    "#chat-open-button",
-    "#chat-close-button",
-    "#score-modal"
+    "#chat_open_button",
+    "#chat_close_button",
+    "#score_modal"
 ]
 
 const hideAllExcept = function(except: Array<string>): void {

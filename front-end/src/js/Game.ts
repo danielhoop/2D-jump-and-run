@@ -19,9 +19,9 @@ class Game {
         "#velocity"
     ];
     private _BUTTON_ELEMENTS = [
-        "#button-left",
-        "#button-right",
-        "#button-jump"
+        "#button_left",
+        "#button_right",
+        "#button_jump"
     ]
     private _GAME_ELEMENTS: Array<string> = Array.prototype.concat(this.CANVAS_ELEMENTS, this._BUTTON_ELEMENTS);
 
@@ -51,13 +51,13 @@ class Game {
         });
 
         // Control buttons for game
-        $("#button-right").on("click", () => {
+        $("#button_right").on("click", () => {
             this._player.moveRight();
         });
-        $("#button-left").on("click", () => {
+        $("#button_left").on("click", () => {
             this._player.moveLeft();
         });
-        $("#button-jump").on("click", () => {
+        $("#button_jump").on("click", () => {
             this._player.jump();
         });
     }
@@ -161,16 +161,16 @@ class Game {
         const viewPortHeight = $(window).height();
         const documentHeight = $(document).height();
         const nSquaresVertical = this._map.getMapData().meta.mapLength * viewPortHeight / documentHeight;
-        const cssWidthRelativeIs = 100 * parseFloat($(".game-canvas").css("width")) / parseFloat($(".game-canvas").parent().css("width"));
+        const cssWidthRelativeIs = 100 * parseFloat($(".game_canvas").css("width")) / parseFloat($(".game_canvas").parent().css("width"));
         let cssWidthRelativeShould = cssWidthRelativeIs * nSquaresVertical / N_SQUARES_VERTICAL;
         if (Math.abs(cssWidthRelativeShould - cssWidthRelativeIs) > 2) {
             if (cssWidthRelativeShould > 100) {
                 cssWidthRelativeShould = 100;
             }
-            $(".game-canvas").css("width", cssWidthRelativeShould.toString() + "%");
-            $(".game-canvas").css("margin-left", (-cssWidthRelativeShould / 2).toString() + "%");
+            $(".game_canvas").css("width", cssWidthRelativeShould.toString() + "%");
+            $(".game_canvas").css("margin-left", (-cssWidthRelativeShould / 2).toString() + "%");
         }
-        $("#group-container").css("position", "absolute");
+        $("#group_container").css("position", "absolute");
         $("#chat").css("position", "absolute");
         /*
         console.log("viewPortHeight: " + viewPortHeight);

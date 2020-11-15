@@ -1,5 +1,7 @@
 import $ from "jquery";
 
+import Lang from "../config/lang";
+import Translator from "./Translator";
 import dom from "./DomOperator";
 import Game from "./Game";
 import Chat from "./Chat"
@@ -37,9 +39,9 @@ const checkScreenOrientation = function () {
         // Determine which elements to show.
         let elementsToShow = [];
         if (dom.isSmartphoneLayout()) {
-            elementsToShow = ["#group-container", "#chat-open-button"];
+            elementsToShow = ["#group_container", "#chat_open_button"];
         } else {
-            elementsToShow = ["#chat", "#group-container"];
+            elementsToShow = ["#chat", "#group_container"];
         }
         dom.hideAllExcept(elementsToShow);
     }
@@ -62,20 +64,20 @@ const removeOrientationChangeFunction = function () {
 
 // Other functions
 const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
-    const name = $("#name-editor").val().toString();
+    const name = $("#name_editor").val().toString();
     if (name != "") {
         user.name = name;
-        $("#name-editor").val("");
-        $("#msg-sender-initially").text(name);
-        $("#" + constants.GROUP_0).children(".group-members").append(
-            '<div class="group-member" id="group-member-id-' + user.id + '">' + name + '</div>');
+        $("#name_editor").val("");
+        $("#msg_sender_initially").text(name);
+        $("#" + constants.GROUP_0).children(".group_members").append(
+            '<div class="group_member" id="group_member_id_' + user.id + '">' + name + '</div>');
 
         // Determine which elements to show.
         let elementsToShow = [];
         if (dom.isSmartphoneLayout()) {
-            elementsToShow = ["#group-container", "#chat-open-button"];
+            elementsToShow = ["#group_container", "#chat_open_button"];
         } else {
-            elementsToShow = ["#chat", "#group-container"];
+            elementsToShow = ["#chat", "#group_container"];
         }
         dom.hideAllExcept(elementsToShow);
 
@@ -99,18 +101,18 @@ const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
 }
 
 const readMsgClearAndSend = function (chat: Chat): void {
-    const val = $("#chat-editor").val().toString();
+    const val = $("#chat_editor").val().toString();
     if (val != "") {
-        $("#chat-editor").val("");
+        $("#chat_editor").val("");
         chat.sendMsg(val);
     }
 }
 
 const startGame = function (user: User, groupId: string, socket: WebSocket) {
     /* const memberIds: Array<string> = [];
-    $("#" + groupId).children(".group-members").children().each(function () {
+    $("#" + groupId).children(".group_members").children().each(function () {
         const id = $(this).attr('id');
-        memberIds.push(id.substring("group-member-id-".length));
+        memberIds.push(id.substring("group_member_id_".length));
     }); */
     console.log(user);
     console.log(groupId);
@@ -165,15 +167,18 @@ const msToMmSsMs = function (ms: number): string {
 }
 
 let game: Game = undefined;
+const translator = new Translator(Lang.Locale.de_de, Lang.Locale.en_us, Lang.elements, Lang.mapping, Lang.txt, true);
 
 $(document).ready(function () {
+
+    translator.nameAllElments();
 
     // Create a user
     const user: User = createUser("unknown");
 
     // Open model to give username.
-    dom.hideAllExcept(["#name-modal"]);
-    $("#name-editor").focus();
+    dom.hideAllExcept(["#name_modal"]);
+    $("#name_editor").focus();
 
     // Web socket.
     if (window["WebSocket"]) {
@@ -192,38 +197,38 @@ $(document).ready(function () {
             console.log("Websocket connection established.");
 
             // Event handler on user name.
-            $("#name-editor").keypress(function (event) {
+            $("#name_editor").keypress(function (event) {
                 const keycode = (event.keyCode ? event.keyCode : event.which);
                 if (keycode == 13) {
                     setUserNameAndChangeFocus(user, socket);
                 }
             });
-            $("#name-enter-button").on("click", function () {
+            $("#name_enter_button").on("click", function () {
                 setUserNameAndChangeFocus(user, socket);
             });
 
             // Chat
             const chat = new Chat(socket, user);
 
-            $("#chat-editor").keypress(function (event) {
+            $("#chat_editor").keypress(function (event) {
                 const keycode = (event.keyCode ? event.keyCode : event.which);
                 if (keycode == 13) {
                     readMsgClearAndSend(chat);
                 }
             });
-            $("#chat-send-button").on("click", function () {
+            $("#chat_send_button").on("click", function () {
                 readMsgClearAndSend(chat);
             });
-            $("#chat-open-button").on("click", function () {
-                dom.hideAllExcept(["#chat", "#chat-close-button"]);
+            $("#chat_open_button").on("click", function () {
+                dom.hideAllExcept(["#chat", "#chat_close_button"]);
             })
-            $("#chat-close-button").on("click", function () {
+            $("#chat_close_button").on("click", function () {
                 // Determine which elements to show.
                 let elementsToShow = [];
                 if (dom.isSmartphoneLayout()) {
-                    elementsToShow = ["#group-container", "#chat-open-button"];
+                    elementsToShow = ["#group_container", "#chat_open_button"];
                 } else {
-                    elementsToShow = ["#chat", "#group-container"];
+                    elementsToShow = ["#chat", "#group_container"];
                 }
                 dom.hideAllExcept(elementsToShow);
             })
@@ -260,18 +265,18 @@ $(document).ready(function () {
                         user.groupId = payload.groupId;
                         user.roomId = payload.roomId;
                     }
-                    $("#group-member-id-" + payload.userId).remove();
+                    $("#group_member_id_" + payload.userId).remove();
                     // If no groupId was given, then just remove from group completely.
                     if (payload.groupId) {
-                        $("#" + payload.groupId).children(".group-members").append(
-                            '<div class="group-member" id="group-member-id-' + payload.userId + '">' + payload.name + '</div>');
+                        $("#" + payload.groupId).children(".group_members").append(
+                            '<div class="group_member" id="group_member_id_' + payload.userId + '">' + payload.name + '</div>');
                     }
 
 
                 } else if (data.type == SocketEvent.START_GAME_CLIENT) {
 
                     removeOrientationChangeFunction();
-                    $("#bg-lake").remove();
+                    $("#bg_lake").remove();
 
                     const payload = data.payload as GameStartData;
                     const otherPlayers = payload.players;
@@ -306,22 +311,22 @@ $(document).ready(function () {
 
                     const scores = data.payload as Scores;
                     scores.forEach(score => {
-                        $("#score-table").append(
-                            `<tr class="score-row"><td><div class="score-name">${score.name}</div></td><td class="score-time">${msToMmSsMs(score.totalTime)}</td></tr>`
+                        $("#score_table").append(
+                            `<tr class="score-row"><td><div class="score_name">${score.name}</div></td><td class="score_time">${msToMmSsMs(score.totalTime)}</td></tr>`
                         );
                     });
 
-                    domOperator.hideAllExcept(["#score-modal"]);
+                    domOperator.hideAllExcept(["#score_modal"]);
 
                     // Play sound.
                     if (scores[0].userId == user.id) {
-                        $("body").append('<div id="bg-lake" class="bg-image"></div>');
+                        $("body").append('<div id="bg_lake" class="bg_image"></div>');
                         new Audio("./sound/Congratulations.mp3").play();
-                        $("#score-title").text("Congratulations! You have won the game!");
+                        $("#score_title").text(translator.getTxtForTag(Lang.Tag.congratulations));
                     } else {
-                        $("body").append('<div id="bg-gondola" class="bg-image bg-blurred"></div>');
+                        $("body").append('<div id="bg_gondola" class="bg_image bg_blurred"></div>');
                         new Audio("./sound/MaybeNextTime.mp3").play();
-                        $("#score-title").text("Maybe next time...");
+                        $("#score_title").text(translator.getTxtForTag(Lang.Tag.maybe_next_time));
                     }
 
                 }

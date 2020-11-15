@@ -9,7 +9,7 @@ export interface User {
 
 export const createUser = function(name: string): User {
   return {
-    name: "unknown",
+    name: name,
     id: undefined,
     roomId: constants.LOBBY,
     groupId: constants.GROUP_0
