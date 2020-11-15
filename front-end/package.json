@@ -7,13 +7,13 @@
     "clean-build": "rimraf build",
     "ts": "tsc",
     "babel": "./node_modules/.bin/babel build-tsc --out-dir build-babel --source-maps",
-    "webpack": "webpack --config webpack.config.jscript",
+    "webpack-dev": "webpack --config webpack-dev.config.jscript",
+    "webpack-prod": "webpack --config webpack-prod.config.jscript",
     "clean-build-steps": "rimraf build-tsc build-babel",
     "postbuild": "cpy **/* !**/*.ts !**/*.js ../build --cwd=./src --parents",
-    "pipeline": "npm run clean-build && npm run ts && npm run babel && npm run webpack && npm run clean-build-steps && npm run postbuild",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "ALT_prebuild": "rimraf ./build",
-    "ALT_pipeline": "npm run prebuild && tsc && npm run postbuild"
+    "pipeline-dev": "npm run clean-build && npm run ts && npm run babel && npm run webpack-dev && npm run clean-build-steps && npm run postbuild",
+    "pipeline-prod": "npm run clean-build && npm run ts && npm run babel && npm run webpack-prod && npm run clean-build-steps && npm run postbuild",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",

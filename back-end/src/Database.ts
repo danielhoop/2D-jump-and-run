@@ -12,15 +12,19 @@ export default class Database {
     constructor() {
         const db = this.openConnection();
 
+        console.log("**************************************************************************");
+        console.log("You can safely ignore errors like 'SQLITE_ERROR: table ... already exists'");
+        console.log("**************************************************************************");
+
         db.run(
             'CREATE TABLE gameEvent ' +
             '(eventId INTEGER PRIMARY KEY, userId TEXT, type INTEGER, x REAL, y REAL, timestamp INTEGER)',
             (err: any) => {
-            if (err) {
-                // Do nothing. In that case, the table already exists.
-                console.log("Error trying to create table 'gameEvent': " + err.message);
+                if (err) {
+                    // Do nothing. In that case, the table already exists.
+                    console.log("Error trying to create table 'gameEvent': " + err.message);
+                }
             }
-        }
         );
         db.run(
             'CREATE TABLE room ' +

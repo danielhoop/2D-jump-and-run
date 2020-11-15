@@ -13,7 +13,7 @@ npm install
 ## If you have changed javascript code
 Open the shell in this folder, then execute this command (it will take approx. 15 seconds):
 ```
-npm run pipeline
+npm run pipeline-dev
 ```
 Source: [https://technicallyrural.ca/2017/09/02/how-to-run-typescript-in-the-browser/](https://technicallyrural.ca/2017/09/02/how-to-run-typescript-in-the-browser/)
 
