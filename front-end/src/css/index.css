@@ -183,33 +183,6 @@ footer {
     padding-bottom: 5px;
 }
 
-/*
-.chat_button_right {
-    padding-left: 50%;
-    padding: 0px 0px 0px 16px !important;
-    border: none;
-    vertical-align: middle;
-    height: 48px;
-    line-height: 48px;
-    float: left;
-}
-
-#chat_editor {
-    background: #fff;
-    border-color: #fff;
-    padding: 3%;
-    width: 90%;
-    /*float: left;
-    display: block;
-}
-
-#chat_send_button {
-    background: #6f9;
-    /*float: right;
-    position: absolute;
-    right: 0;
-}*/
-
 .text_field_left {
     background: rgba(255, 255, 255, 0.5);
     border-color: rgba(255, 255, 255, 0.5);
@@ -286,9 +259,11 @@ footer {
     #button_right {
         position: fixed;
         bottom: 5%;
-        right: 10%;
-        
+    
         width: 5%;
+        left: 20%;
+        /*left: 50%;
+        margin-left: -2.5%;*/
         visibility: hidden;
     }
     #button_left {
@@ -302,11 +277,9 @@ footer {
     #button_jump {
         position: fixed;
         bottom: 5%;
-    
+        right: 10%;
+        
         width: 5%;
-        right: 20%;
-        /*left: 50%;
-        margin-left: -2.5%;*/
         visibility: hidden;
     }
 }
@@ -347,9 +320,11 @@ footer {
     #button_right {
         position: fixed;
         bottom: 7%;
-        right: 10%;
-        
+    
         width: 10%;
+        left: 35%;
+        /*left: 50%;
+        margin-left: -5%;*/
         visibility: hidden;
     }
     #button_left {
@@ -363,11 +338,9 @@ footer {
     #button_jump {
         position: fixed;
         bottom: 7%;
-    
+        right: 10%;
+        
         width: 10%;
-        right: 35%;
-        /*left: 50%;
-        margin-left: -5%;*/
         visibility: hidden;
     }
 }
