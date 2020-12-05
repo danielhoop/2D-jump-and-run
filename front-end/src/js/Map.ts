@@ -86,39 +86,6 @@ export class Map {
         }, this._msBetweenDrawing);
     }
 
-    /*
-    private draw_slowVersion(): void {
-        const content = this._content;
-        const m = this._meta.multiplier;
-        for (let y = 0; y < content.length; y++) {
-            for (let x = 0; x < content[y].length; x++) {
-                const field = content[y][x];
-                // First the background.
-                if (field.image != ImageType.TRAIL && field.image != ImageType.GRASS) {
-                    const imgBg = new Image();
-                    imgBg.onload = () => {
-                        // Drawing the image with coordinates pointing to top-left corner.
-                        this._ctx.drawImage(imgBg, x * m, y * m, m, m);
-                    }
-                    if (field.isTrail) {
-                        imgBg.src = this.imgToPath(ImageType.TRAIL);
-                    } else {
-                        imgBg.src = this.imgToPath(ImageType.GRASS);
-                    }
-
-                }
-                // Then the object
-                const img = new Image();
-                img.onload = () => {
-                    // Drawing the image with coordinates pointing to top-left corner.
-                    this._ctx.drawImage(img, x * m, y * m, m, m);
-                }
-                img.src = this.imgToPath(field.image);
-            }
-        }
-    }
-    */
-
     getStartingPoint(): Coord {
         return {
             x: Math.floor(this._meta.mapWidth / 2),

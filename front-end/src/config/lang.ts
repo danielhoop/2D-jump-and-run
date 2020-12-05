@@ -16,12 +16,14 @@ const Tag = {
     "start_game_2": "start_game_2",
     "start_game_3": "start_game_3",
     "congratulations": "congratulations",
-    "maybe_next_time": "maybe_next_time"
+    "maybe_next_time": "maybe_next_time",
+    "no_connection_to_server": "no_connection_to_server"
 }
 
 const Element = {
     "name_editor_title": "name_editor_title",
     "name_enter_button": "name_enter_button",
+    "no_connection_to_server": "no_connection_to_server",
     "choose_group_title": "choose_group_title",
     "goup_lobby_title": "goup_lobby_title",
     "group_1_title": "group_1_title",
@@ -35,6 +37,7 @@ const Element = {
 const mapping = {
     [Element.name_editor_title]: Tag.enter_nickname,
     [Element.name_enter_button]: Tag.proceed,
+    [Element.no_connection_to_server]: Tag.no_connection_to_server,
     [Element.choose_group_title]: Tag.choose_group,
     [Element.goup_lobby_title]: Tag.lobby,
     [Element.group_1_title]: Tag.game_1,
@@ -49,6 +52,7 @@ const txt = {
     [Locale.en_us]: {
         [Tag.enter_nickname]: "Please enter your nickname",
         [Tag.proceed]: "Proceed",
+        [Element.no_connection_to_server]: "Connection to the server not established.",
         [Tag.choose_group]: "Choose your group by clicking on it.",
         [Tag.lobby]: "Lobby",
         [Tag.game_1]: "Game 1",
@@ -64,6 +68,7 @@ const txt = {
     [Locale.de_de]: {
         [Tag.enter_nickname]: "Bitte gib deinen Namen an.",
         [Tag.proceed]: "Fortfahren",
+        [Element.no_connection_to_server]: "Die Verbindung zu Server konnte nicht hergestellt werden.",
         [Tag.choose_group]: "Wähle eine Gruppe aus, indem du auf sie klickst.",
         [Tag.lobby]: "Lobby",
         [Tag.game_1]: "Spiel 1",

@@ -109,6 +109,16 @@ footer {
     visibility: hidden;
 }
 
+#no_connection_to_server {
+    visibility: hidden;
+    margin-top: 10px;
+    position: absolute;
+    top: 0px;
+    font-family: inherit;
+    text-align: center;
+    width: 100%;
+}
+
 #score_modal {
     visibility: hidden;
 }

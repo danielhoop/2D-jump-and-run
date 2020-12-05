@@ -24,5 +24,5 @@ The server will be started automatically.
 # Only start the server (without building)
 Open the shell in this folder, then execute this command:
 ```
-npm run startServer
+npm run start-server
 ```

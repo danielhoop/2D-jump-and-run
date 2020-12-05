@@ -11,16 +11,12 @@ export class GlobalState {
         // Create socket
         // TODO: Read address from environment viable?
         this._socket = new WebSocket("ws://" + config.serverIpPort);
+        console.log("Websocket address: " + "ws://" + config.serverIpPort);
 
         // On close
         this._socket.onclose = function () {
             console.log("Websocket connection closed.");
         };
-
-        // On Open
-        this._socket.onopen = function () {
-            //
-        }
     }
 
     static getInstance(): GlobalState {

@@ -6,7 +6,7 @@
   "scripts": {
     "cleanBuild": "rimraf ./build",
     "pipeline-dev": "npm run cleanBuild && npm run ts-dev && npm run start-server",
-    "pipeline-prod": "npm run cleanBuild && npm run ts-prod && npm run start-server",
+    "pipeline-prod": "npm run cleanBuild && npm run ts-prod",
     "start-server": "node ./build/index.js",
     "ts-dev": "tsc --p tsconfig-dev.json",
     "ts-prod": "tsc --p ./tsconfig-prod.json",

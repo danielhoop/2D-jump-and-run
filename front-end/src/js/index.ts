@@ -196,6 +196,7 @@ $(document).ready(function () {
         // And inside is 'socket.onmessage'
         socket.onopen = function () {
             console.log("Websocket connection established.");
+            $("#no_connection_to_server").remove();
 
             // Event handler on user name.
             $("#name_editor").keypress(function (event) {
@@ -371,4 +372,16 @@ $(document).ready(function () {
             })
         };
     }
+
+    // Show element that says - no connection possible (after 800 ms)
+    // If the connection was established, then nothing will happen, because the element was deleted.
+    let i = 0;
+    const interv = setInterval(() => {
+        if (i == 1) {
+            clearInterval(interv);
+        } else {
+            $("#no_connection_to_server").css("visibility", "visible");
+            i++;
+        }
+    }, 800);
 });
