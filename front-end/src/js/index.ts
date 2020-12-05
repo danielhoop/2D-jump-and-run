@@ -24,45 +24,8 @@ import { MapData } from "./MapTypes";
 import domOperator from "./DomOperator";
 
 
-// Orientation handling
-// https://stackoverflow.com/questions/1649086/detect-rotation-of-android-phone-in-the-browser-with-javascript
-let previousHeightWidth = $(window).width() + $(window).height();
-let previousOrientation = window.orientation;
-let orientationChangeInterval = null;
 
-const checkScreenOrientation = function () {
-    const currentHeightWith = $(window).width() + $(window).height();
-    if (window.orientation !== previousOrientation || currentHeightWith != previousHeightWidth) {
-        previousOrientation = window.orientation;
-        previousHeightWidth = currentHeightWith;
-
-        // Determine which elements to show.
-        let elementsToShow = [];
-        if (dom.isSmartphoneLayout()) {
-            elementsToShow = ["#group_container", "#chat_open_button"];
-        } else {
-            elementsToShow = ["#chat", "#group_container"];
-        }
-        dom.hideAllExcept(elementsToShow);
-    }
-};
-
-const addOrientationChangeFunction = function () {
-    window.addEventListener("resize", checkScreenOrientation, false);
-    window.addEventListener("orientationchange", checkScreenOrientation, false);
-
-    // (optional) Android doesn't always fire orientationChange on 180 degree turns
-    orientationChangeInterval = setInterval(checkScreenOrientation, 2000);
-}
-
-const removeOrientationChangeFunction = function () {
-    window.removeEventListener("resize", checkScreenOrientation, false);
-    window.removeEventListener("orientationchange", checkScreenOrientation, false);
-    clearInterval(orientationChangeInterval);
-}
-
-
-// Other functions
+// Functions
 const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
     const name = $("#name_editor").val().toString();
     if (name != "") {
@@ -82,7 +45,8 @@ const setUserNameAndChangeFocus = function (user: User, socket: WebSocket) {
         dom.hideAllExcept(elementsToShow);
 
         // Add orientation change function to event listener.
-        addOrientationChangeFunction();
+        dom.checkScreenOrientation(); // Check once such that 'wasSmartphoneLayout' is set.
+        dom.addOrientationChangeFunction();
 
         // Tell the server the name of the user.
         const userData: UserData = {
@@ -276,7 +240,7 @@ $(document).ready(function () {
 
                 } else if (data.type == SocketEvent.START_GAME_CLIENT) {
 
-                    removeOrientationChangeFunction();
+                    dom.removeOrientationChangeFunction();
                     $("#bg_lake").remove();
 
                     const payload = data.payload as GameStartData;

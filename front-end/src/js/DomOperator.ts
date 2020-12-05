@@ -25,7 +25,7 @@ const allElementsOnPage: Array<string> = [
     "#score_modal"
 ]
 
-const hideAllExcept = function(except: Array<string>): void {
+const hideAllExcept = function (except: Array<string>): void {
     allElementsOnPage.forEach(element => {
         except.forEach(notHideElement => {
             if (element != notHideElement) {
@@ -36,13 +36,67 @@ const hideAllExcept = function(except: Array<string>): void {
     except.forEach(element => {
         $(element).css("visibility", "visible");
     })
-} 
+}
 
-const isSmartphoneLayout = function(): boolean {
+const isSmartphoneLayout = function (): boolean {
     return $(window).width() <= 600;
 }
 
+
+
+
+
+
+// Orientation handling
+// https://stackoverflow.com/questions/1649086/detect-rotation-of-android-phone-in-the-browser-with-javascript
+let previousHeightWidth = $(window).width() + $(window).height();
+let previousOrientation = window.orientation;
+let orientationChangeInterval = null;
+let wasSmartphoneLayout = false;
+
+const checkScreenOrientation = function (): void {
+    const currentHeightWith = $(window).width() + $(window).height();
+    if (window.orientation !== previousOrientation || currentHeightWith != previousHeightWidth) {
+        previousOrientation = window.orientation;
+        previousHeightWidth = currentHeightWith;
+
+        // Determine which elements to show.
+        let elementsToShow = [];
+        if (isSmartphoneLayout()) {
+            if (!wasSmartphoneLayout) {
+                elementsToShow = ["#group_container", "#chat_open_button"];
+                wasSmartphoneLayout = true;
+            }
+        } else {
+            elementsToShow = ["#group_container", "#chat"];
+            wasSmartphoneLayout = false;
+        }
+        hideAllExcept(elementsToShow);
+    }
+};
+
+const addOrientationChangeFunction = function (): void {
+    window.addEventListener("resize", checkScreenOrientation, false);
+    window.addEventListener("orientationchange", checkScreenOrientation, false);
+
+    // (optional) Android doesn't always fire orientationChange on 180 degree turns
+    orientationChangeInterval = setInterval(checkScreenOrientation, 2000);
+}
+
+const removeOrientationChangeFunction = function (): void {
+    window.removeEventListener("resize", checkScreenOrientation, false);
+    window.removeEventListener("orientationchange", checkScreenOrientation, false);
+    clearInterval(orientationChangeInterval);
+}
+
+
+
+
+
 export default {
     hideAllExcept,
-    isSmartphoneLayout
+    isSmartphoneLayout,
+    checkScreenOrientation,
+    addOrientationChangeFunction,
+    removeOrientationChangeFunction
 };
