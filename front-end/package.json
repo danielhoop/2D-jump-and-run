@@ -1,6 +1,6 @@
 {
   "name": "5-seen-client",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "5-Seen-Wanderung-Spiel Back-End. Websocket fuer Spiel-Synchronisation zwischen Front-Ends.",
   "main": "index.html",
   "scripts": {

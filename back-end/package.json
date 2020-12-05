@@ -1,6 +1,6 @@
 {
-  "name": "5-seen-back-end",
-  "version": "0.1.0",
+  "name": "5-seen-server",
+  "version": "1.0.0",
   "description": "5-Seen-Wanderung-Spiel Back-End. Websocket fuer Spiel-Synchronisation zwischen Front-Ends.",
   "main": "main.js",
   "scripts": {
