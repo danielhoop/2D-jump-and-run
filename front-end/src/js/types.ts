@@ -10,7 +10,7 @@ export const constants = {
     BUTTON_GROUP_1: "button_group_id_1",
     BUTTON_GROUP_2: "button_group_id_2",
     BUTTON_GROUP_3: "button_group_id_3",
-    MAX_ROOM_SIZE: 3,
+    MAX_ROOM_SIZE: 10,
     MAX_FIELDS_PER_SECOND: 4,
     PENALTY_SECONDS_FOR_CHEATING: 5*60
 }

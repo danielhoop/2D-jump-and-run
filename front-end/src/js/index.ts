@@ -16,7 +16,6 @@ import {
     constants,
     GameStartData,
     PlayerPosition,
-    Scores,
     ScorePayload,
 } from "./types";
 import { Player } from "./Player";

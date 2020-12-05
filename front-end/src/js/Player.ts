@@ -11,7 +11,14 @@ export class Player {
     static PLAYER_1 = 1;
     static PLAYER_2 = 2;
     static PLAYER_3 = 3;
-    static OTHER_POTENTIAL_PLAYERS = [2, 3];
+    static PLAYER_4 = 4;
+    static PLAYER_5 = 5;
+    static PLAYER_6 = 6;
+    static PLAYER_7 = 7;
+    static PLAYER_8 = 8;
+    static PLAYER_9 = 9;
+    static PLAYER_10 = 10;
+    static OTHER_POTENTIAL_PLAYERS = [2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     private _MIN_VELOCITY = 1;
     private _MAX_VELOCITY = 4;
@@ -96,14 +103,28 @@ export class Player {
         return {
             [Player.PLAYER_1]: "player1",
             [Player.PLAYER_2]: "player2",
-            [Player.PLAYER_3]: "player3"
+            [Player.PLAYER_3]: "player3",
+            [Player.PLAYER_4]: "player4",
+            [Player.PLAYER_5]: "player5",
+            [Player.PLAYER_6]: "player6",
+            [Player.PLAYER_7]: "player7",
+            [Player.PLAYER_8]: "player8",
+            [Player.PLAYER_9]: "player9",
+            [Player.PLAYER_10]: "player10"
         }[this._playerNo.toString()];
     }
     private playerNoToImagePath(): string {
         return {
             [Player.PLAYER_1]: "./img/hiker-colored.png",
             [Player.PLAYER_2]: "./img/hiker.png",
-            [Player.PLAYER_3]: "./img/hiker.png"
+            [Player.PLAYER_3]: "./img/hiker.png",
+            [Player.PLAYER_4]: "./img/hiker.png",
+            [Player.PLAYER_5]: "./img/hiker.png",
+            [Player.PLAYER_6]: "./img/hiker.png",
+            [Player.PLAYER_7]: "./img/hiker.png",
+            [Player.PLAYER_8]: "./img/hiker.png",
+            [Player.PLAYER_9]: "./img/hiker.png",
+            [Player.PLAYER_10]: "./img/hiker.png"
         }[this._playerNo.toString()];
     }
 

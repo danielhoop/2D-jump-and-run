@@ -16,6 +16,13 @@ class Game {
         "#player1",
         "#player2",
         "#player3",
+        "#player4",
+        "#player5",
+        "#player6",
+        "#player7",
+        "#player8",
+        "#player9",
+        "#player10",
         "#velocity"
     ];
     private _BUTTON_ELEMENTS = [
@@ -144,15 +151,6 @@ class Game {
             scrollToHeight = documentHeight - pixelsWalked - viewPortHeight * (1 - REL_Y_POSITION_FROM_BOTTOM);
         }
         window.scrollTo(0, scrollToHeight);
-
-        // Position the game elements
-        // TODO
-
-        /*console.log("documentHeight: " + documentHeight);
-        console.log("viewPortHeight: " + viewPortHeight);
-        console.log("partOfPathTaken: " + partOfPathTaken);
-        console.log("pixelsWalked: " + pixelsWalked);
-        console.log("scrollToHeight: " + scrollToHeight);*/
     }
 
     // Dynamically style canvas with CSS. Is called after each second.
@@ -175,13 +173,6 @@ class Game {
         }
         $("#group_container").css("position", "absolute");
         $("#chat").css("position", "absolute");
-        /*
-        console.log("viewPortHeight: " + viewPortHeight);
-        console.log("documentHeight: " + documentHeight);
-        console.log("nSquaresVertical : " + nSquaresVertical);
-        console.log("cssWidthRelative : " + cssWidthRelativeIs);
-        console.log("cssWidthRelativeShould: " + cssWidthRelativeShould);
-        */
     }
 
     private setCanvasDimensions(): void {

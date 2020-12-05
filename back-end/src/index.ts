@@ -97,6 +97,9 @@ const deleteUserFromRoom = function (userData: UserData, sendToAll: boolean): vo
 const deleteUserFromGroup = function (userData: UserData, sendToAll: boolean): void {
     const { userId } = userData;
     const groupId = userDataList[userId].user.groupId;
+    // Delete info in user.
+    userDataList[userId].user.groupId = undefined;
+    // Delete info in group.
     if (groupId && groups[groupId]) {
         groups[groupId] = _.difference(groups[groupId], [userId]);
     }
@@ -385,11 +388,11 @@ server.on("connection", function (socket) {
                     content: createMap(mapLevelMetaData[0])
                 }
             }
-            const mapToSend: SocketData = {
+            const gameStartSocketData: SocketData = {
                 type: SocketEvent.START_GAME_CLIENT,
                 payload: gameStartPayload
             }
-            sendToRoom(JSON.stringify(mapToSend), newRoomId);
+            sendToRoom(JSON.stringify(gameStartSocketData), newRoomId);
 
             // Set starting time for level.
             rooms[newRoomId].startingTime = new Date().getTime();
