@@ -1,0 +1,63 @@
+@startuml
+' actor "Player X" as pl1 #red
+' actor "Player Y" as pl2
+
+participant "Client A" as cl1
+participant "Client B" as cl2
+
+participant Server as serv
+
+cl1 <- serv: Provide unique id.
+cl1 -> serv: Tell chosen username.
+cl2 <- serv: Provide unique id.
+cl2 -> serv: Tell chosen username.
+
+cl1 -> serv: Choose group 1.
+cl1 <-- serv: Player X has chosen group 1.
+cl1 -> cl1: Move Player X to group 1.
+cl2 <-- serv: Player X has chosen group 1.
+cl2 -> cl2: Move Player X to group 1.
+
+cl2 -> serv: Choose group 1.
+cl1 <-- serv: Player Y has chosen group 1.
+cl1 -> cl1: Move Player Y to group 1.
+cl2 <-- serv: Player Y has chosen group 1.
+cl2 -> cl2: Move Player Y to group 1.
+
+cl1 -> serv: Start game.
+serv -> serv: Create map for first level.
+cl1 <-- serv: Send map and list of other players.
+cl2 <-- serv: Send map and list of other players.
+
+loop For 5 levels...
+
+	loop Until all players have reached the end of the map.
+
+		cl1 -> serv: Send position data.
+		cl2 <-- serv: Send position of Player X (or event of collision).\nElements of the map could have changed.
+		cl2 -> serv: Send position data.
+		cl1 <-- serv: Send position of Player Y (or event of collision).\nElements of the map could have changed.
+
+		alt Player X has reached end of map
+			cl1 -> serv: Has reached end of map.
+			serv -> serv: Store time needed of Player X.
+		else Player Y has reached end of map
+			cl2 -> serv: Has reached end of map.
+			serv -> serv: Store time needed of Player Y.
+		end
+	end
+
+	serv -> serv: Create next level.
+	cl1 <- serv: Send map of next level.
+	cl2 <- serv: Send map of next level.
+
+end
+
+serv -> serv: Accumulate the time needed of all levels.\nMake ranking.
+cl1 <- serv: Send ranking.
+cl2 <- serv: Send ranking.
+
+cl1 -> cl1: Present ranking to Player.
+cl2 -> cl2: Present ranking to Player.
+
+@enduml

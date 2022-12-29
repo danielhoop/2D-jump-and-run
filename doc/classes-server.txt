@@ -1,0 +1,42 @@
+@startuml
+
+Index --> Database
+Index --> MapCreator
+
+class Index {
+	-PORT: number
+	-server: WebSocket.Server
+	-db: Database
+	-userDataList: Record<string, UserDataAndSocket>
+	-rooms: Record<string, RoomData>
+	-groups: Record<string, Array<string>>
+	
+	-sendBroadcast(txt: string): void
+	-sendToRecipients(txt: string, recipientIds: Array<string>): void
+	-sendToRoom(txt: string, roomId: string, exceptUserId: string = undefined): void
+	-deleteUserFromRoom(userData: UserData, sendToAll: boolean): void
+	-deleteUserFromGroup(userData: UserData, sendToAll: boolean): void
+	-moveUserToRoom(userData: UserData, sendToAll: boolean): void
+	-moveUserToGroup(userData: UserData, sendToAll: boolean): void
+	-sendGoupOrRoomChangeInfo(userData: UserData, sendToAll: boolean, sendToUserId: string = undefined): void
+	-switchToNextLevelOrStopGame(roomId: string): void
+}
+
+class Database {
+	-FILENAME: string
+	-db: sqlite3.Database
+	
+	+{static} constructor(): Database
+	+addRoom(roomId: string, startTimestamp: number): void
+	+addWinnerToRoom(winnerId: string, winnerTime: number, endTimestamp: number, roomId: string): void
+	+addScore(userId: string, userName: string, totalTime: number, roomId: string): void
+	+addGameEvent(userId: string, type: GameEvent, x: number, y: number, timestamp: number): void
+	-openConnection(): sqlite3.Database
+}
+
+class MapCreator {
+	+{static} mapLevelMetaData: Array<MapMetaData>
+	+{static} createMap(param: MapMetaData): MapContent
+}
+
+@enduml

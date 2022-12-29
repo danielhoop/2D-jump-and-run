@@ -1,0 +1,81 @@
+@startuml
+
+participant "Index" as main
+participant "Game" as game
+actor "Actor" as actor
+participant "Own player" as player
+participant "Other player" as other
+participant "Map" as map
+participant "Socket" as serv
+
+main <- serv: Send information:\n- Game starts!\n- Map\n- List of players
+main -> player: new Player(...)
+main -> other: Player.createOtherPlayers(...)
+main -> game: new Game({own player},\n                 {other players})
+main -> game: game.setMap(...)
+main -> game: game.start()
+
+alt Until the server sends ranking information
+
+	group Parallel processes...
+
+		loop Until data of next map is received or server sends ranking
+			alt Player input
+				actor -> player: Move left/right; Jump.
+			else
+				game -> player: player.gameLoop()
+				player -> player: moveForward()
+			end
+			
+			alt player has not yet reached end of map
+				player -> player: updatePosition()
+				
+				activate player
+					alt Player is not jumping
+						alt Player has not max. velocity.
+							player -> map: map.touchesFood(coord)
+							player <-- map: yes/no
+							alt Has touched food
+								player -> player: increaseVeloctiy()
+							end
+						end			
+						
+						player -> map: map.touchesObstacle(coord)
+						player <-- map: yes/no
+						alt Has touched obstacle
+							player -> player: decreaseVelocity()
+						end
+					end
+					player -> player: drawAvatar()
+					player -> serv: Send position and collision info.
+				deactivate player
+				
+			end
+			player -> player: drawVelocity()
+			game -> game: Scroll such that player is\nin middle of screen.
+			game -> game: If necessary, adapt map\nsize for responsiveness.
+		end
+
+	else
+
+		loop Until data of next map is received or server sends ranking
+			serv -> main: Position info.
+			main -> game: game.updatePlayerPosition(...)
+			game -> other: otherPlayer.updatePosition(...)
+			other -> other: Draw on canvas.
+		end
+
+	end
+
+	main <- serv: Send data for next map.
+	main -> game: stop()
+	main -> game: game.setMap(...)
+	main -> game: game.start()
+
+else Receives ranking information
+
+	main -> actor: Present raking.
+
+end
+
+@enduml

@@ -1,0 +1,99 @@
+@startuml
+
+
+Index --> Game
+Index --> DomOperator
+Index --> GlobalState
+Index --> Translator
+Index --> Chat
+Game --> Player
+Game --> Map
+Game --> DomOperator
+Player --> Map
+Player --> GlobalState
+Chat --> GlobalState
+
+Index : -game: Game
+Index : -setUserNameAndChangeFocus(user: User, socket: WebSocket): void
+Index : -readMsgClearAndSend(chat: Chat): void 
+Index : -startGame(user: User, groupId: string, socket: WebSocket): void
+Index : -moveUserToGroup(user: User, groupId: string, socket: WebSocket): void
+
+class Translator {
+	-locale: string
+    -fallback: string
+    -elements: Array<string>
+    -txt: Record<string, Record<string, string>>
+    -elementTagMapping: Record<string, string>
+    -verbose: boolean
+	
+	constructor(locale, fallback, elements, elementTagMapping, txt, verbose)
+	+setLocale(locale: string): void
+	+nameAllElments(): void
+	+getTxtForTag(tag: string): string
+	-getTxtForLocal()
+}
+
+class Chat {
+	-user: User
+	-globalState: GlobalState
+	+sendMsg(txt: string): void
+	+receiveMsg(msg: ChatMessage): void
+}
+
+Game : -player: Player
+Game : -players: Record<string, Player>
+Game : -map: Map
+Game : +{static} constructor(player: Player, players: Record<string, Player>): Game
+Game : +setMap(mapData: MapData): void
+Game : +start(): void
+Game : +stop(): void
+Game : +updatePlayerPosition(position: PlayerPosition): void
+Game : -gameLoop(): void
+Game : -scroll(): void
+Game : -adjustCanvasCssWidth(): void
+
+Player : +x: number
+Player : +y: number
+Player : -A lot of -attributes.
+Player : +{static} constructor(user: User, playerNo: number, isActor: boolean): Player
+Player : +{static} createOtherPlayers(players: Array<UserData>): Record<string, Player>
+Player : +initialize(map: Map, fps: number)
+Player : +updatePosition(position: PlayerPosition): void
+Player : +gameLoop(): void
+Player : +moveRight(): void
+Player : +moveLeft(): void
+Player : +jump(): void
+Player : -setVelocity(value: number): void
+Player : -increaseVelocity(): void
+Player : -decreaseVelocity(): void
+Player : -drawVelocity(): void
+Player : -drawAvatar(): void
+
+
+Map : - content: MapContent;
+Map : - meta: MapMetaData;
+Map : - canvas: HTMLCanvasElement;
+Map : - ctx: CanvasRenderingContext2D;
+Map : +{static} constructor(mapData: MapData): Map
+Map : +setMap(mapData: MapData): void
+Map : +getMapData(): MapData
+Map : +draw(): void
+Map : +getStartingPoint(): Coord
+Map : +touchesObstacle(coord: Coord): boolean
+Map : +touchesFood(coord: Coord): boolean
+Map : -touchesSomething(coord: Coord, what: FieldType): Coord
+
+DomOperator : +{static} hideAllExcept(except: Array<string>): void
+DomOperator : +{static} isSmartphoneLayout(): boolean
+DomOperator : +checkScreenOrientation(): void
+DomOperator : +addOrientationChangeFunction(): void
+DomOperator : +removeOrientationChangeFunction(): void
+
+GlobalState : -socket: WebSocket
+GlobalState : -instance: GlobalState
+GlobalState : +{static} getInstance(): GlobalState
+GlobalState : +getSocket(): WebSocket
+GlobalState : -{static} constructor(): GlobalState
+
+@enduml

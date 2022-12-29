@@ -359,6 +359,20 @@ server.on("connection", function (socket) {
             const playersData: Array<UserData> = [];
             const userIdsInGroup: Array<string> = _.clone(groups[userDataList[userId].user.groupId])
 
+            if (!userIdsInGroup) {
+                console.log("**** Error ****. No users in group?!")
+                console.log("This is the starting user:")
+                console.log(userDataList[userId].user)
+                console.log("These are the groups:")
+                console.log(groups)
+                return;
+            } else {
+                console.log("This is the starting user:")
+                console.log(userDataList[userId].user)
+                console.log("These are the groups:")
+                console.log(groups)
+            }
+
             db.addRoom(newRoomId, new Date().getTime());
 
             userIdsInGroup.forEach(userId => {
